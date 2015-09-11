@@ -8,13 +8,14 @@ namespace BahamutFireCommon.Algorithm
     public class FireAccessInfo
     {
         public string FileId { get; set; }
-        public string AccessFileUserId { get; set; }
+        public string AccessFileAccountId { get; set; }
     }
 
     public interface IFireAccesskeyConverter
     {
+        bool IsAccessKeyGenerateByConverter(string accessKey);
         string GenerateAccesskey(string accessFileUserId,FireRecord file);
-        string GetFireAccessInfoFromAccesskey(string accessKey);
+        FireAccessInfo GetFireAccessInfoFromAccesskey(string accessKey);
     }
 
     public interface IFireAccesskeyConverterContainer
@@ -22,6 +23,7 @@ namespace BahamutFireCommon.Algorithm
         IDictionary<string,IFireAccesskeyConverter> Converters { get; set; }
         void UseConverter<T>(T Converter) where T : IFireAccesskeyConverter;
         IFireAccesskeyConverter GetConverter(string ConverterName);
+        IFireAccesskeyConverter GetConverterOfAccessKey(string accessKey);
     }
 
     public class DefaultFireAccesskeyConverterContainer : IFireAccesskeyConverterContainer
@@ -32,6 +34,18 @@ namespace BahamutFireCommon.Algorithm
         }
 
         public IDictionary<string, IFireAccesskeyConverter> Converters { get; set; }
+
+        public IFireAccesskeyConverter GetConverterOfAccessKey(string accessKey)
+        {
+            foreach (var converter in Converters)
+            {
+                if (converter.Value.IsAccessKeyGenerateByConverter(accessKey))
+                {
+                    return converter.Value;
+                }
+            }
+            throw new NullReferenceException("No Converter Can Decrypt");
+        }
 
         public IFireAccesskeyConverter GetConverter(string ConverterName)
         {

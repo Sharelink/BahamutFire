@@ -26,5 +26,18 @@ namespace BahamutFireService.Service
         {
             return from f in files select GetAccesskey(accessFileAccountId, f);
         }
+
+        public FireAccessInfo GetFireAccessInfo(string accessKey)
+        {
+            try
+            {
+                return ConverterContainer.GetConverterOfAccessKey(accessKey).GetFireAccessInfoFromAccesskey(accessKey);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+            
+        }
     }
 }
