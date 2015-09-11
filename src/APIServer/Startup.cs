@@ -10,8 +10,8 @@ using Microsoft.Framework.DependencyInjection;
 using BahamutService;
 using DataLevelDefines;
 using Microsoft.Framework.Configuration;
-using Microsoft.Framework.Runtime;
 using BahamutFire.APIServer.Authentication;
+using Microsoft.Dnx.Runtime;
 
 namespace BahamutFire.APIServer
 {
