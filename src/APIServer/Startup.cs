@@ -23,6 +23,7 @@ namespace BahamutFire.APIServer
         {
             var builder = new ConfigurationBuilder(appEnv.ApplicationBasePath)
                 .AddJsonFile("config.json")
+                .AddIniFile("hosting.ini")
                 .AddEnvironmentVariables();
             Configuration = builder.Build();
             TokenServerConfig = new RedisServerConfig()
@@ -36,7 +37,7 @@ namespace BahamutFire.APIServer
             {
                 Url = Configuration["Data:BahamutFireDBServer:Url"]
             };
-            ServiceUrl = Configuration["Data:ServiceUrl"];
+            ServiceUrl = Configuration["server.urls"];
             TokenService = new TokenService(TokenServerConfig);
         }
         public static IRedisServerConfig TokenServerConfig { private set; get; }

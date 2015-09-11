@@ -3,12 +3,11 @@
     "appname": "BahamutFireAPIServer",
     "appkey": "b078082bd9d5c63da1b4c5d546a9fa44b6c879b2"
   },
-  "ServiceUrl": "http:192.168.0.168:8088",
   "BahamutFireDBServer": {
-    "Url": "mongodb://192.168.0.20:27017"
+    "Url": "mongodb://192.168.1.23:27017"
   },
   "TokenServer": {
-    "Host": "192.168.0.20",
+    "Host": "192.168.1.23",
     "Port": 6379,
     "Password": null,
     "Db": 0
