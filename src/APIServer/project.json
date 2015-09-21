@@ -14,6 +14,7 @@
 
     "commands": {
         "web": "Microsoft.AspNet.Hosting --config hosting.ini"
+        "web": "Microsoft.AspNet.Hosting --config hosting1.ini"
     },
 
     "frameworks": {
