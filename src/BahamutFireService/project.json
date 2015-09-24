@@ -6,9 +6,10 @@
     "projectUrl": "",
     "licenseUrl": "",
 
-    "dependencies": {
-        "BahamutFireCommon": "1.0.0-*"
-    },
+  "dependencies": {
+    "BahamutCommon": "1.0.0-*",
+    "BahamutFireCommon": "1.0.0-*"
+  },
 
     "frameworks": {
         "dnx451": { }

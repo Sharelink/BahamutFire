@@ -28,7 +28,7 @@ namespace BahamutFire.APIServer.Controllers
                 var fire = fireService.GetFireRecord(info.FileId);
                 if (fire.IsSmallFile)
                 {
-                    return File(fire.SmallFileData, fire.FileType);
+                    return File(fire.SmallFileData, "application/octet-stream");
                 }
                 else
                 {
@@ -36,8 +36,9 @@ namespace BahamutFire.APIServer.Controllers
                     return RedirectToAction("Index", "GetFile",routeValues);
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Console.WriteLine(ex.Message);
                 return HttpNotFound();   
             }
         }
@@ -46,26 +47,28 @@ namespace BahamutFire.APIServer.Controllers
         POST /Files (fileType,fileSize) : get a new send file key for upload task
         */
         [HttpPost]
-        public SendFileTask PostOne([FromBody]string fileType, int fileSize)
+        public object PostOne(string fileType, int fileSize)
         {
             var akService = new FireAccesskeyService();
             var fService = new FireService(Startup.BahamutFireDbConfig);
             var accountId = Context.Request.Headers["accountId"];
-            var newFireRecords = new FireRecord[] 
+            var newFireRecords = new FireRecord[]
             {
                 new FireRecord
                 {
                     CreateTime = DateTime.Now,
                     FileSize = fileSize,
                     FileType = fileType,
-                    IsSmallFile = fileSize < 1024 * 1027 * 7,
+                    IsSmallFile = fileSize < 1024 * 1024 * 7,
                     State = (int)FireRecordState.Create,
-                    AccountId = accountId
+                    AccountId = accountId,
+                    UploadServerUrl = Startup.ServiceUrl + "/UploadFile",
+                    AccessKeyConverter = akService.DefaultConverterName
                 }
             };
 
-            var r = fService.CreateFireRecord(newFireRecords).ElementAt(0);
-            var result = new SendFileTask()
+            var r = fService.CreateFireRecord(newFireRecords).First();
+            var result = new
             {
                 acceptServerUrl = r.UploadServerUrl,
                 accessKey = akService.GetAccesskey(accountId, r)
@@ -75,10 +78,10 @@ namespace BahamutFire.APIServer.Controllers
         }
 
         /*
-        POST /Files (fileType,fileSize) : get a new send file key for upload task
+        POST /Files (fileTypes,fileSizes) : get a new send file key for upload task
         */
         [HttpPost("More")]
-        public SendFileTask[] PostMore([FromBody]string fileTypes,string fileSizes)
+        public SendFileTask[] PostMore(string fileTypes,string fileSizes)
         {
             var akService = new FireAccesskeyService();
             var fService = new FireService(Startup.BahamutFireDbConfig);

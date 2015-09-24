@@ -12,6 +12,7 @@ using DataLevelDefines;
 using Microsoft.Framework.Configuration;
 using BahamutFire.APIServer.Authentication;
 using Microsoft.Dnx.Runtime;
+using ServiceStack.Redis;
 
 namespace BahamutFire.APIServer
 {
@@ -26,19 +27,12 @@ namespace BahamutFire.APIServer
                 .AddIniFile("hosting.ini")
                 .AddEnvironmentVariables();
             Configuration = builder.Build();
-            TokenServerConfig = new RedisServerConfig()
-            {
-                Db = long.Parse(Configuration["Data:TokenServer:Db"]),
-                Host = Configuration["Data:TokenServer:Host"],
-                Password = Configuration["Data:TokenServer:Password"],
-                Port = int.Parse(Configuration["Data:TokenServer:Port"])
-            };
             BahamutFireDbConfig = new MongoDbServerConfig()
             {
                 Url = Configuration["Data:BahamutFireDBServer:Url"]
             };
             ServiceUrl = Configuration["server.urls"];
-            TokenService = new TokenService(TokenServerConfig);
+            
         }
         public static IRedisServerConfig TokenServerConfig { private set; get; }
         public static TokenService TokenService { private set; get; }
@@ -49,7 +43,8 @@ namespace BahamutFire.APIServer
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
-            
+            var TokenServerClientManager = new RedisManagerPool(Configuration["Data:TokenServer:url"]);
+            TokenService = new TokenService(TokenServerClientManager);
             // Uncomment the following line to add Web API services which makes it easier to port Web API 2 controllers.
             // You will also need to add the Microsoft.AspNet.Mvc.WebApiCompatShim package to the 'dependencies' section of project.json.
             // services.AddWebApiConventions();
@@ -61,8 +56,8 @@ namespace BahamutFire.APIServer
             // Configure the HTTP request pipeline.
             app.UseStaticFiles();
             // Add MVC to the request pipeline.
+            app.UseMiddleware<BasicAuthentication>(); //must in front of UseMvc
             app.UseMvc();
-            app.UseMiddleware<BasicAuthentication>();
             // Add the following route for porting Web API 2 controllers.
             // routes.MapWebApiRoute("DefaultApi", "api/{controller}/{id?}");
         }

@@ -24,6 +24,7 @@ namespace BahamutFire.APIServer.Authentication
             var userId = httpContext.Request.Headers["userId"];
             var token = httpContext.Request.Headers["token"];
             var appkey = httpContext.Request.Headers["appkey"];
+            Console.WriteLine(httpContext.Request.Path);
             var res = await Startup.TokenService.ValidateAppToken(appkey, userId, token);
             if(res != null)
             {

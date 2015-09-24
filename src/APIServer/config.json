@@ -1,15 +1,15 @@
 {
-  "App": {
-    "appname": "BahamutFireAPIServer",
-    "appkey": "b078082bd9d5c63da1b4c5d546a9fa44b6c879b2"
-  },
-  "BahamutFireDBServer": {
-    "Url": "mongodb://192.168.1.23:27017"
-  },
-  "TokenServer": {
-    "Host": "192.168.1.23",
-    "Port": 6379,
-    "Password": null,
-    "Db": 0
+
+  "Data": {
+    "App": {
+      "appname": "BahamutFireAPIServer",
+      "appkey": "b078082bd9d5c63da1b4c5d546a9fa44b6c879b2"
+    },
+    "BahamutFireDBServer": {
+      "Url": "mongodb://192.168.1.23:27017"
+    },
+    "TokenServer": {
+      "url": "redis://192.168.1.23:6379"
+    }
   }
 }

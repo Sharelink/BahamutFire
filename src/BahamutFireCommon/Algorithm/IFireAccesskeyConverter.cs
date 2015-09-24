@@ -13,6 +13,7 @@ namespace BahamutFireCommon.Algorithm
 
     public interface IFireAccesskeyConverter
     {
+        string ConverterName { get; }
         bool IsAccessKeyGenerateByConverter(string accessKey);
         string GenerateAccesskey(string accessFileUserId,FireRecord file);
         FireAccessInfo GetFireAccessInfoFromAccesskey(string accessKey);
@@ -54,7 +55,7 @@ namespace BahamutFireCommon.Algorithm
 
         public void UseConverter<T>(T Converter) where T : IFireAccesskeyConverter
         {
-            Converters.Add(typeof(T).ToString(), Converter);
+            Converters.Add(Converter.ConverterName, Converter);
         }
     }
 }

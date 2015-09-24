@@ -9,9 +9,11 @@ using BahamutFireService.Service;
 
 namespace BahamutFire.APIServer.Controllers
 {
+    [Route("[controller]")]
     public class GetFileController : Controller
     {
         // GET: /<controller>/
+        [HttpGet]
         public IActionResult Index(string accessKey)
         {
             var fireService = new FireService(Startup.BahamutFireDbConfig);
