@@ -2,15 +2,16 @@
     "webroot": "wwwroot",
     "version": "1.0.0-*",
 
-    "dependencies": {
-        "Microsoft.AspNet.Mvc": "6.0.0-beta7",
-        "Microsoft.AspNet.Server.IIS": "1.0.0-beta7",
-        "Microsoft.AspNet.Server.WebListener": "1.0.0-beta7",
-        "Microsoft.AspNet.StaticFiles": "1.0.0-beta7",
-        "BahamutFireService": "1.0.0-*",
-        "BahamutService": "1.0.0-*",
-        "Microsoft.Framework.Configuration.Json": "1.0.0-beta7"
-    },
+  "dependencies": {
+    "Microsoft.AspNet.Mvc": "6.0.0-beta7",
+    "Microsoft.AspNet.Server.IIS": "1.0.0-beta7",
+    "Microsoft.AspNet.Server.WebListener": "1.0.0-beta7",
+    "Microsoft.AspNet.StaticFiles": "1.0.0-beta7",
+    "BahamutFireService": "1.0.0-*",
+    "BahamutService": "1.0.0-*",
+    "Microsoft.Framework.Configuration.Json": "1.0.0-beta7",
+    "ServerControlService": "1.0.0-*"
+  },
 
     "commands": {
         "web": "Microsoft.AspNet.Hosting --config hosting.ini"

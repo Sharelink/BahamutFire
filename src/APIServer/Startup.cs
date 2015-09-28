@@ -13,6 +13,7 @@ using Microsoft.Framework.Configuration;
 using BahamutFire.APIServer.Authentication;
 using Microsoft.Dnx.Runtime;
 using ServiceStack.Redis;
+using ServerControlService.Model;
 
 namespace BahamutFire.APIServer
 {
@@ -32,12 +33,13 @@ namespace BahamutFire.APIServer
                 Url = Configuration["Data:BahamutFireDBServer:Url"]
             };
             ServiceUrl = Configuration["server.urls"];
-            
+            Appkey = Configuration["Data:App:Appkey"];
         }
         public static IRedisServerConfig TokenServerConfig { private set; get; }
         public static TokenService TokenService { private set; get; }
         public static IMongoDbServerConfig BahamutFireDbConfig { get; private set; }
         public static string ServiceUrl { get; private set; }
+        public static string Appkey { get; private set; }
         // This method gets called by a runtime.
         // Use this method to add services to the container
         public void ConfigureServices(IServiceCollection services)
@@ -45,6 +47,17 @@ namespace BahamutFire.APIServer
             services.AddMvc();
             var TokenServerClientManager = new RedisManagerPool(Configuration["Data:TokenServer:url"]);
             TokenService = new TokenService(TokenServerClientManager);
+
+            var ControlServerServiceClientManager = new RedisManagerPool(Configuration["Data:ControlServiceServer:url"]);
+            var serverMgrService = new ServerControlService.Service.ServerControlManagementService(ControlServerServiceClientManager);
+            var appInstance = new BahamutAppInstance()
+            {
+                Appkey = Startup.Appkey,
+                InstanceServiceUrl = Configuration["server.urls"]
+            };
+            appInstance = serverMgrService.RegistAppInstance(appInstance);
+            serverMgrService.StartKeepAlive(appInstance.Id);
+
             // Uncomment the following line to add Web API services which makes it easier to port Web API 2 controllers.
             // You will also need to add the Microsoft.AspNet.Mvc.WebApiCompatShim package to the 'dependencies' section of project.json.
             // services.AddWebApiConventions();

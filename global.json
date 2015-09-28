@@ -1,5 +1,5 @@
 {
-    "projects": [ "src", "test", "../BahamutZero/src" ],
+  "projects": [ "src", "test", "../BahamutZero/src", "../ServerControl/src" ],
     "sdk": {
       "version": "1.0.0-beta7"
     }
