@@ -28,6 +28,7 @@ namespace BahamutFire.APIServer.Controllers
                 var fire = fireService.GetFireRecord(info.FileId);
                 if (fire.IsSmallFile)
                 {
+                    Response.ContentLength = fire.FileSize;
                     return File(fire.SmallFileData, "application/octet-stream");
                 }
                 else

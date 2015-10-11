@@ -25,10 +25,12 @@ namespace BahamutFire.APIServer.Controllers
 
                 if (fire.IsSmallFile)
                 {
+                    Response.ContentLength = fire.FileSize;
                     return File(fire.SmallFileData, fire.FileType);
                 }
                 else
                 {
+                    Response.ContentLength = fire.FileSize;
                     return File(fireService.GetBigFireData(fire.Id.ToString()), fire.FileType);
                 }
             }
