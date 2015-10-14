@@ -10,7 +10,8 @@
     "BahamutFireService": "1.0.0-*",
     "BahamutService": "1.0.0-*",
     "Microsoft.Framework.Configuration.Json": "1.0.0-beta7",
-    "ServerControlService": "1.0.0-*"
+    "ServerControlService": "1.0.0-*",
+    "Microsoft.AspNet.Mvc.Abstractions": "6.0.0-beta7"
   },
 
     "commands": {

@@ -25,7 +25,10 @@ namespace BahamutFire.APIServer.Controllers
             try
             {
                 var info = akService.GetFireAccessInfo(accessKey);
-                var fire = fireService.GetFireRecord(info.FileId);
+                var fire = Task.Run(async () =>
+                {
+                    return await fireService.GetFireRecord(info.FileId);
+                }).Result;
                 if (fire.IsSmallFile)
                 {
                     Response.ContentLength = fire.FileSize;
@@ -67,13 +70,17 @@ namespace BahamutFire.APIServer.Controllers
                     AccessKeyConverter = akService.DefaultConverterName
                 }
             };
-
-            var r = fService.CreateFireRecord(newFireRecords).First();
-            var result = new
+            var result = Task.Run(async () =>
             {
-                acceptServerUrl = r.UploadServerUrl,
-                accessKey = akService.GetAccesskey(accountId, r)
-            };
+                var rs = await fService.CreateFireRecord(newFireRecords);
+                var r = rs.First();
+                return new
+                {
+                    acceptServerUrl = r.UploadServerUrl,
+                    accessKey = akService.GetAccesskey(accountId, r)
+                };
+            }).Result;
+            
             return result;
 
         }
@@ -109,8 +116,11 @@ namespace BahamutFire.APIServer.Controllers
                     AccountId = accountId
                 };
             }
-
-            var records = fService.CreateFireRecord(newFireRecords);
+            var records = Task.Run(async () =>
+            {
+                return await fService.CreateFireRecord(newFireRecords);
+            }).Result;
+            
             var tasks = from r in records
                         select new SendFileTask()
                         {
@@ -131,7 +141,9 @@ namespace BahamutFire.APIServer.Controllers
             var akService = new FireAccesskeyService();
             var infos = from ak in accessKeyArray select akService.GetFireAccessInfo(ak);
             var fileIds = from fi in infos where fi.AccessFileAccountId == accountId select fi.FileId;
-            var count = fService.DeleteFires(accountId, fileIds);
+            var count = Task.Run(() => {
+                return fService.DeleteFires(accountId, fileIds);
+            }).Result;
             return count;
         }
     }

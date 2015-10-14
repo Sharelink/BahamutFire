@@ -21,7 +21,10 @@ namespace BahamutFire.APIServer.Controllers
             try
             {
                 var info = akService.GetFireAccessInfo(accessKey);
-                var fire = fireService.GetFireRecord(info.FileId);
+                var fire = Task.Run(() =>
+                {
+                    return fireService.GetFireRecord(info.FileId);
+                }).Result;
 
                 if (fire.IsSmallFile)
                 {

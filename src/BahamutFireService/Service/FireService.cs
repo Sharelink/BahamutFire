@@ -28,7 +28,7 @@ namespace BahamutFireService.Service
 
         public async Task SaveFireData(string fileId, byte[] data)
         {
-            var record = GetFireRecord(fileId);
+            var record = await GetFireRecord(fileId);
             if (record.IsSmallFile)
             {
                 var update = new UpdateDefinitionBuilder<FireRecord>().Set(fr => fr.SmallFileData, data).Set(fr => fr.State, (int)FireRecordState.Saved);
@@ -42,35 +42,24 @@ namespace BahamutFireService.Service
             }
         }
 
-        public FireRecord GetFireRecord(string fileId)
+        public async Task<FireRecord> GetFireRecord(string fileId)
         {
             var collection = Client.GetDatabase(FireDBName).GetCollection<FireRecord>("FireRecord");
             var oId = new ObjectId(fileId);
-            var result = Task.Run(() =>
-            {
-                return collection.Find(fr => fr.Id == oId).SingleAsync();
-            }).Result;
-            return result;
+            return await collection.Find(fr => fr.Id == oId).SingleAsync();
         }
 
-        public IEnumerable<FireRecord> CreateFireRecord(IEnumerable<FireRecord> newFireRecords)
+        public async Task<IEnumerable<FireRecord>> CreateFireRecord(IEnumerable<FireRecord> newFireRecords)
         {
-            var result = Task.Run(async () =>
-            {
-                await Client.GetDatabase(FireDBName).GetCollection<FireRecord>("FireRecord").InsertManyAsync(newFireRecords);
-                return newFireRecords;
-            }).Result;
-            return result;
+            await Client.GetDatabase(FireDBName).GetCollection<FireRecord>("FireRecord").InsertManyAsync(newFireRecords);
+            return newFireRecords;
         }
 
-        public long DeleteFires(string accountId, IEnumerable<string> fileIds)
+        public async Task<long> DeleteFires(string accountId, IEnumerable<string> fileIds)
         {
-            var result = Task.Run(() =>
-            {
-                var update = new UpdateDefinitionBuilder<FireRecord>().Set(fr => fr.State, (int)FireRecordState.Delete);
-                return Client.GetDatabase(FireDBName).GetCollection<FireRecord>("FireRecord").UpdateManyAsync(fr => fr.AccountId == accountId && fileIds.Contains(fr.Id.ToString()), update);
-            });
-            return result.Result.ModifiedCount;
+            var update = new UpdateDefinitionBuilder<FireRecord>().Set(fr => fr.State, (int)FireRecordState.Delete);
+            var result = await Client.GetDatabase(FireDBName).GetCollection<FireRecord>("FireRecord").UpdateManyAsync(fr => fr.AccountId == accountId && fileIds.Contains(fr.Id.ToString()), update);
+            return result.ModifiedCount;
         }
     }
 }

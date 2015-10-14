@@ -20,7 +20,7 @@ namespace BahamutFire.APIServer.Controllers
             var fireService = new FireService(Startup.BahamutFireDbConfig);
             var akService = new FireAccesskeyService();
             var info = akService.GetFireAccessInfo(accessKey);
-            var fireRecord = fireService.GetFireRecord(info.FileId);
+            
             var accountId = Context.Request.Headers["accountId"];
             if (info.AccessFileAccountId != accountId)
             {
@@ -29,6 +29,7 @@ namespace BahamutFire.APIServer.Controllers
 
             var result = Task.Run(async () =>
             {
+                var fireRecord = await fireService.GetFireRecord(info.FileId);
                 var reader = new BinaryReader(Context.Request.Body);
                 var data = reader.ReadBytes(fireRecord.FileSize);
                 if (data.Length == fireRecord.FileSize)
