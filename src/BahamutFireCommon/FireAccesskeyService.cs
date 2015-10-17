@@ -20,14 +20,13 @@ namespace BahamutFireService.Service
             }
         }
 
-        public string GenerateAccesskey(string accessFileUserId, FireRecord file)
+        public string GenerateAccesskey(string accessFileAccountId, string fileId)
         {
-            var fileId = file.Id.ToString();
             var b64 = new Base64();
             var md5 = new MD5_Hsr();
             var spliteOperator = md5.HashString(PRIMARY_KEY);
             var fileb64 = b64.EncodeString(fileId);
-            var userb64 = b64.EncodeString(accessFileUserId);
+            var userb64 = b64.EncodeString(accessFileAccountId);
             return b64.EncodeString(string.Format("{0}{1}{2}", fileb64, spliteOperator,userb64));
         }
 
@@ -67,15 +66,28 @@ namespace BahamutFireService.Service
             DefaultConverterName = defaultConverter.ConverterName;
         }
 
-        public string GetAccesskey(string accessFileAccountId, FireRecord file)
+        public string GetAccessKeyUseDefaultConverter(string accessFireAccountId,string fileId)
         {
-            IFireAccesskeyConverter converter = ConverterContainer.GetConverter(file.AccessKeyConverter);
-            return converter.GenerateAccesskey(accessFileAccountId, file);
+            if (fileId == null)
+            {
+                return null;
+            }
+            return GetAccesskey(DefaultConverterName, accessFireAccountId, fileId);
+        }
+
+        public string GetAccesskey(string converterName,string accessFileAccountId, string fileId)
+        {
+            if (fileId == null)
+            {
+                return null;
+            }
+            IFireAccesskeyConverter converter = ConverterContainer.GetConverter(converterName);
+            return converter.GenerateAccesskey(accessFileAccountId, fileId);
         }
 
         public IEnumerable<string> GetAccesskeys(string accessFileAccountId,ICollection<FireRecord> files)
         {
-            return from f in files select GetAccesskey(accessFileAccountId, f);
+            return from f in files select GetAccesskey(f.AccessKeyConverter, accessFileAccountId, f.Id.ToString());
         }
 
         public FireAccessInfo GetFireAccessInfo(string accessKey)

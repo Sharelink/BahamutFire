@@ -27,14 +27,4 @@ namespace BahamutFireCommon
         public string UploadServerUrl { get; set; }
     }
 
-
-    /// <summary>
-    /// return for client
-    /// </summary>
-    public class SendFileTask
-    {
-        public string accessKey { get; set; }
-        public string fileId { get { return accessKey; } } //it's same with accessKey for client
-        public string acceptServerUrl { get; set; }
-    }
 }

@@ -19,13 +19,13 @@ namespace BahamutFire.APIServer.Authentication
             _next = next;
         }
 
-        public async Task<Task> Invoke(HttpContext httpContext)
+        public Task Invoke(HttpContext httpContext)
         {
             var userId = httpContext.Request.Headers["userId"];
             var token = httpContext.Request.Headers["token"];
             var appkey = httpContext.Request.Headers["appkey"];
             Console.WriteLine(httpContext.Request.Path);
-            var res = await Startup.TokenService.ValidateAppToken(appkey, userId, token);
+            var res = Startup.TokenService.ValidateAppToken(appkey, userId, token).Result;
             if(res != null)
             {
                 httpContext.Request.Headers["accountId"] = res.AccountId;

@@ -18,17 +18,18 @@ namespace BahamutFire.APIServer.Controllers
         GET /Files/{id} : get a new send file key for upload task
         */
         [HttpGet("{accessKey}")]
-        public IActionResult Get(string accessKey)
+        public async Task<IActionResult> Get(string accessKey)
         {
             var fireService = new FireService(Startup.BahamutFireDbConfig);
             var akService = new FireAccesskeyService();
             try
             {
                 var info = akService.GetFireAccessInfo(accessKey);
-                var fire = Task.Run(async () =>
+                if (info.AccessFileAccountId != Request.Headers["accountId"])
                 {
-                    return await fireService.GetFireRecord(info.FileId);
-                }).Result;
+                    return HttpBadRequest();
+                }
+                var fire = await fireService.GetFireRecord(info.FileId);
                 if (fire.IsSmallFile)
                 {
                     Response.ContentLength = fire.FileSize;
@@ -37,13 +38,13 @@ namespace BahamutFire.APIServer.Controllers
                 else
                 {
                     var routeValues = new { accessKey = accessKey };
-                    return RedirectToAction("Index", "GetFile",routeValues);
+                    return RedirectToAction("Index", "GetFile", routeValues);
                 }
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
-                return HttpNotFound();   
+                return HttpNotFound();
             }
         }
 
@@ -51,89 +52,38 @@ namespace BahamutFire.APIServer.Controllers
         POST /Files (fileType,fileSize) : get a new send file key for upload task
         */
         [HttpPost]
-        public object PostOne(string fileType, int fileSize)
+        public async Task<object> PostOne(string fileType, int fileSize)
         {
             var akService = new FireAccesskeyService();
             var fService = new FireService(Startup.BahamutFireDbConfig);
             var accountId = Context.Request.Headers["accountId"];
-            var newFireRecords = new FireRecord[]
+            var newFire = new FireRecord
             {
-                new FireRecord
-                {
-                    CreateTime = DateTime.Now,
-                    FileSize = fileSize,
-                    FileType = fileType,
-                    IsSmallFile = fileSize < 1024 * 1024 * 7,
-                    State = (int)FireRecordState.Create,
-                    AccountId = accountId,
-                    UploadServerUrl = Startup.ServiceUrl + "/UploadFile",
-                    AccessKeyConverter = akService.DefaultConverterName
-                }
+                CreateTime = DateTime.Now,
+                FileSize = fileSize,
+                FileType = fileType,
+                IsSmallFile = fileSize < 1024 * 1024 * 7,
+                State = (int)FireRecordState.Create,
+                AccountId = accountId,
+                UploadServerUrl = Startup.ServiceUrl + "/UploadFile",
+                AccessKeyConverter = akService.DefaultConverterName
             };
-            var result = Task.Run(async () =>
+            var rs = await fService.CreateFireRecord(new FireRecord[] { newFire });
+            var r = rs.First();
+            var fileId = r.Id.ToString();
+            var accessKey = akService.GetAccesskey(newFire.AccessKeyConverter, accountId, fileId);
+            return new
             {
-                var rs = await fService.CreateFireRecord(newFireRecords);
-                var r = rs.First();
-                return new
-                {
-                    acceptServerUrl = r.UploadServerUrl,
-                    accessKey = akService.GetAccesskey(accountId, r)
-                };
-            }).Result;
-            
-            return result;
-
-        }
-
-        /*
-        POST /Files (fileTypes,fileSizes) : get a new send file key for upload task
-        */
-        [HttpPost("More")]
-        public SendFileTask[] PostMore(string fileTypes,string fileSizes)
-        {
-            var akService = new FireAccesskeyService();
-            var fService = new FireService(Startup.BahamutFireDbConfig);
-            var accountId = Context.Request.Headers["accountId"];
-            var sizes = from fs in fileSizes.Split('#') select int.Parse(fs);
-            var types = fileTypes.Split('#');
-            if (types.Count() != sizes.Count())
-            {
-                Response.StatusCode = (int)HttpStatusCode.BadRequest;
-                return null;
-            }
-            var length = fileTypes.Count();
-            var newFireRecords = new FireRecord[length];
-            for (int i = 0; i < length; i++)
-            {
-                var fileSize = sizes.ElementAt(i);
-                newFireRecords[i] = new FireRecord
-                {
-                    CreateTime = DateTime.Now,
-                    FileSize = fileSize,
-                    FileType = types.ElementAt(i),
-                    IsSmallFile = fileSize < 1024 * 1027 * 7,
-                    State = (int)FireRecordState.Create,
-                    AccountId = accountId
-                };
-            }
-            var records = Task.Run(async () =>
-            {
-                return await fService.CreateFireRecord(newFireRecords);
-            }).Result;
-            
-            var tasks = from r in records
-                        select new SendFileTask()
-                        {
-                            acceptServerUrl = r.UploadServerUrl,
-                            accessKey = akService.GetAccesskey(accountId, r)
-                        };
-            return tasks.ToArray();
+                server = newFire.UploadServerUrl,
+                accessKey = accessKey,
+                fileId = fileId
+            };
 
         }
 
         // DELETE Files/
         [HttpDelete("{accessKeyIds}")]
-        public long Delete(string accessKeyIds)
+        public async Task<long> Delete(string accessKeyIds)
         {
             var accessKeyArray = accessKeyIds.Split('#');
             var accountId = Context.Request.Headers["accountId"];
@@ -141,9 +91,7 @@ namespace BahamutFire.APIServer.Controllers
             var akService = new FireAccesskeyService();
             var infos = from ak in accessKeyArray select akService.GetFireAccessInfo(ak);
             var fileIds = from fi in infos where fi.AccessFileAccountId == accountId select fi.FileId;
-            var count = Task.Run(() => {
-                return fService.DeleteFires(accountId, fileIds);
-            }).Result;
+            var count = await fService.DeleteFires(accountId, fileIds);
             return count;
         }
     }

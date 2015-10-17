@@ -6,9 +6,10 @@
     "projectUrl": "",
     "licenseUrl": "",
 
-    "dependencies": {
-        "DataLevelDefines": "1.0.0-*"
-    },
+  "dependencies": {
+    "BahamutCommon": "1.0.0-*",
+    "DataLevelDefines": "1.0.0-*"
+  },
 
     "frameworks": {
         "dnx451": { }

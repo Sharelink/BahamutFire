@@ -14,17 +14,14 @@ namespace BahamutFire.APIServer.Controllers
     {
         // GET: /<controller>/
         [HttpGet]
-        public IActionResult Index(string accessKey)
+        public async Task<IActionResult> Index(string accessKey)
         {
             var fireService = new FireService(Startup.BahamutFireDbConfig);
             var akService = new FireAccesskeyService();
             try
             {
                 var info = akService.GetFireAccessInfo(accessKey);
-                var fire = Task.Run(() =>
-                {
-                    return fireService.GetFireRecord(info.FileId);
-                }).Result;
+                var fire = await fireService.GetFireRecord(info.FileId);
 
                 if (fire.IsSmallFile)
                 {
