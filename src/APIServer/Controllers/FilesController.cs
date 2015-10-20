@@ -59,7 +59,7 @@ namespace BahamutFire.APIServer.Controllers
             var accountId = Context.Request.Headers["accountId"];
             var newFire = new FireRecord
             {
-                CreateTime = DateTime.Now,
+                CreateTime = DateTime.UtcNow,
                 FileSize = fileSize,
                 FileType = fileType,
                 IsSmallFile = fileSize < 1024 * 1024 * 7,
