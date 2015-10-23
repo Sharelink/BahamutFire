@@ -12,6 +12,7 @@ namespace BahamutFire.APIServer.Controllers
     [Route("[controller]")]
     public class GetFileController : Controller
     {
+
         // GET: /<controller>/
         [HttpGet]
         public async Task<IActionResult> Index(string accessKey)
