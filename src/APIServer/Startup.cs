@@ -23,7 +23,8 @@ namespace BahamutFire.APIServer
 
         public Startup(IHostingEnvironment env, IApplicationEnvironment appEnv)
         {
-            var builder = new ConfigurationBuilder(appEnv.ApplicationBasePath)
+            var builder = new ConfigurationBuilder()
+                .SetBasePath(appEnv.ApplicationBasePath)
                 .AddJsonFile("config.json")
                 .AddIniFile("hosting.ini")
                 .AddEnvironmentVariables();

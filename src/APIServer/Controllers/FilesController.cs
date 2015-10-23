@@ -56,7 +56,7 @@ namespace BahamutFire.APIServer.Controllers
         {
             var akService = new FireAccesskeyService();
             var fService = new FireService(Startup.BahamutFireDbConfig);
-            var accountId = Context.Request.Headers["accountId"];
+            var accountId = Request.Headers["accountId"];
             var newFire = new FireRecord
             {
                 CreateTime = DateTime.UtcNow,
@@ -86,7 +86,7 @@ namespace BahamutFire.APIServer.Controllers
         public async Task<long> Delete(string accessKeyIds)
         {
             var accessKeyArray = accessKeyIds.Split('#');
-            var accountId = Context.Request.Headers["accountId"];
+            var accountId = Request.Headers["accountId"];
             var fService = new FireService(Startup.BahamutFireDbConfig);
             var akService = new FireAccesskeyService();
             var infos = from ak in accessKeyArray select akService.GetFireAccessInfo(ak);

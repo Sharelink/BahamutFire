@@ -16,19 +16,19 @@ namespace BahamutFire.APIServer.Controllers
         [HttpPost]
         public async Task<IActionResult> Index()
         {
-            string accessKey = Context.Request.Headers["accessKey"];
+            string accessKey = Request.Headers["accessKey"];
             var fireService = new FireService(Startup.BahamutFireDbConfig);
             var akService = new FireAccesskeyService();
             var info = akService.GetFireAccessInfo(accessKey);
 
-            var accountId = Context.Request.Headers["accountId"];
+            var accountId = Request.Headers["accountId"];
             if (info.AccessFileAccountId != accountId)
             {
                 return HttpUnauthorized();
             }
 
             var fireRecord = await fireService.GetFireRecord(info.FileId);
-            var reader = new BinaryReader(Context.Request.Body);
+            var reader = new BinaryReader(Request.Body);
             var data = reader.ReadBytes(fireRecord.FileSize);
             if (data.Length == fireRecord.FileSize)
             {
