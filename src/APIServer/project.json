@@ -10,7 +10,7 @@
     "BahamutService": "1.0.0-*",
     "Microsoft.Framework.Configuration.Json": "1.0.0-*",
     "ServerControlService": "1.0.0-*",
-    "Microsoft.Framework.Configuration.Ini": "1.0.0-beta8"
+    "Microsoft.Framework.Configuration.Ini": "1.0.0-*"
   },
 
     "commands": {
