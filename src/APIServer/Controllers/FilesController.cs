@@ -65,7 +65,8 @@ namespace BahamutFire.APIServer.Controllers
                 IsSmallFile = fileSize < 1024 * 1024 * 7,
                 State = (int)FireRecordState.Create,
                 AccountId = accountId,
-                UploadServerUrl = Startup.ServiceUrl + "/UploadFile",
+                
+                UploadServerUrl = Startup.AppUrl + "/UploadFile",
                 AccessKeyConverter = akService.DefaultConverterName
             };
             var rs = await fService.CreateFireRecord(new FireRecord[] { newFire });

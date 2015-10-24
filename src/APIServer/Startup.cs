@@ -26,21 +26,20 @@ namespace BahamutFire.APIServer
             var builder = new ConfigurationBuilder()
                 .SetBasePath(appEnv.ApplicationBasePath)
                 .AddJsonFile("config.json")
-                .AddIniFile("hosting.ini")
                 .AddEnvironmentVariables();
             Configuration = builder.Build();
             BahamutFireDbConfig = new MongoDbServerConfig()
             {
-                Url = Configuration["Data:BahamutFireDBServer:Url"]
+                Url = Configuration["Data:BahamutFireDBServer:url"]
             };
-            ServiceUrl = Configuration["server.urls"];
-            Appkey = Configuration["Data:App:Appkey"];
+            AppUrl = Configuration["Data:App:url"];
+            Appkey = Configuration["Data:App:appkey"];
         }
         public static IRedisServerConfig TokenServerConfig { private set; get; }
         public static TokenService TokenService { private set; get; }
         public static IMongoDbServerConfig BahamutFireDbConfig { get; private set; }
-        public static string ServiceUrl { get; private set; }
         public static string Appkey { get; private set; }
+        public static string AppUrl { get; private set; }
         // This method gets called by a runtime.
         // Use this method to add services to the container
         public void ConfigureServices(IServiceCollection services)
@@ -54,7 +53,7 @@ namespace BahamutFire.APIServer
             var appInstance = new BahamutAppInstance()
             {
                 Appkey = Startup.Appkey,
-                InstanceServiceUrl = Configuration["server.urls"]
+                InstanceServiceUrl = Configuration["Data:App:url"]
             };
             appInstance = serverMgrService.RegistAppInstance(appInstance);
             serverMgrService.StartKeepAlive(appInstance.Id);

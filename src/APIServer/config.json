@@ -3,17 +3,18 @@
   "Data": {
     "App": {
       "appname": "BahamutFireAPIServer",
-      "appkey": "b078082bd9d5c63da1b4c5d546a9fa44b6c879b2"
+      "appkey": "b078082bd9d5c63da1b4c5d546a9fa44b6c879b2",
+      "url": "http://file.sharelink.online:8089"
     },
     "BahamutFireDBServer": {
-      "Url": "mongodb://192.168.1.23:27017"
+      "url": "mongodb://filedb.sharelink.online:27017"
     },
     "TokenServer": {
-      "url": "redis://192.168.1.23:6379"
+      "url": "redis://token.sharelink.online:6379"
     },
 
     "ControlServiceServer": {
-      "url": "redis://192.168.1.23:6379"
+      "url": "redis://app.sharelink.online:6379"
     }
   }
 }
