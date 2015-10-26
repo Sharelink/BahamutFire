@@ -1,10 +1,17 @@
 {
   "profiles": {
     "IIS Express": {
-      "commandName" : "IISExpress",
+      "commandName": "IISExpress",
       "launchBrowser": true,
       "launchUrl": "api/values",
-      "environmentVariables" : {
+      "environmentVariables": {
+        "ASPNET_ENV": "Development"
+      }
+    },
+    "web": {
+      "commandName": "web",
+      "commandLineArgs": "--server.urls http://file.sharelink.online:8089",
+      "environmentVariables": {
         "ASPNET_ENV": "Development"
       }
     }
