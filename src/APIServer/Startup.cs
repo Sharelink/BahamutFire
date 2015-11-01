@@ -8,7 +8,6 @@ using Microsoft.AspNet.Http;
 using Microsoft.AspNet.Routing;
 using Microsoft.Framework.DependencyInjection;
 using BahamutService;
-using DataLevelDefines;
 using Microsoft.Framework.Configuration;
 using BahamutFire.APIServer.Authentication;
 using Microsoft.Dnx.Runtime;
@@ -28,16 +27,12 @@ namespace BahamutFire.APIServer
                 .AddJsonFile("config.json")
                 .AddEnvironmentVariables();
             Configuration = builder.Build();
-            BahamutFireDbConfig = new MongoDbServerConfig()
-            {
-                Url = Configuration["Data:BahamutFireDBServer:url"]
-            };
+            BahamutFireDbUrl = Configuration["Data:BahamutFireDBServer:url"];
             AppUrl = Configuration["Data:App:url"];
             Appkey = Configuration["Data:App:appkey"];
         }
-        public static IRedisServerConfig TokenServerConfig { private set; get; }
         public static TokenService TokenService { private set; get; }
-        public static IMongoDbServerConfig BahamutFireDbConfig { get; private set; }
+        public static string BahamutFireDbUrl { get; private set; }
         public static string Appkey { get; private set; }
         public static string AppUrl { get; private set; }
         // This method gets called by a runtime.

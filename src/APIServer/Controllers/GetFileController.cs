@@ -17,7 +17,7 @@ namespace BahamutFire.APIServer.Controllers
         [HttpGet]
         public async Task<IActionResult> Index(string accessKey)
         {
-            var fireService = new FireService(Startup.BahamutFireDbConfig);
+            var fireService = new FireService(Startup.BahamutFireDbUrl);
             var akService = new FireAccesskeyService();
             try
             {

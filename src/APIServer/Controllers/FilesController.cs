@@ -20,7 +20,7 @@ namespace BahamutFire.APIServer.Controllers
         [HttpGet("{accessKey}")]
         public async Task<IActionResult> Get(string accessKey)
         {
-            var fireService = new FireService(Startup.BahamutFireDbConfig);
+            var fireService = new FireService(Startup.BahamutFireDbUrl);
             var akService = new FireAccesskeyService();
             try
             {
@@ -55,7 +55,7 @@ namespace BahamutFire.APIServer.Controllers
         public async Task<object> PostOne(string fileType, int fileSize)
         {
             var akService = new FireAccesskeyService();
-            var fService = new FireService(Startup.BahamutFireDbConfig);
+            var fService = new FireService(Startup.BahamutFireDbUrl);
             var accountId = Request.Headers["accountId"];
             var newFire = new FireRecord
             {
@@ -88,7 +88,7 @@ namespace BahamutFire.APIServer.Controllers
         {
             var accessKeyArray = accessKeyIds.Split('#');
             var accountId = Request.Headers["accountId"];
-            var fService = new FireService(Startup.BahamutFireDbConfig);
+            var fService = new FireService(Startup.BahamutFireDbUrl);
             var akService = new FireAccesskeyService();
             var infos = from ak in accessKeyArray select akService.GetFireAccessInfo(ak);
             var fileIds = from fi in infos where fi.AccessFileAccountId == accountId select fi.FileId;

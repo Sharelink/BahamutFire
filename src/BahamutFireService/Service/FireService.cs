@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using MongoDB.Driver;
-using DataLevelDefines;
 using MongoDB.Bson;
 
 namespace BahamutFireService.Service
@@ -15,9 +14,9 @@ namespace BahamutFireService.Service
 
         public IMongoClient Client { get; set; }
 
-        public FireService(IMongoDbServerConfig Config)
+        public FireService(string mongoDbUrl)
         {
-            Client = new MongoClient(new MongoUrl(Config.Url));
+            Client = new MongoClient(new MongoUrl(mongoDbUrl));
         }
 
         public byte[] GetBigFireData(string fileId)
