@@ -23,9 +23,16 @@ namespace BahamutFire.APIServer
         public Startup(IHostingEnvironment env, IApplicationEnvironment appEnv)
         {
             var builder = new ConfigurationBuilder()
-                .SetBasePath(appEnv.ApplicationBasePath)
-                .AddJsonFile("config.json")
-                .AddEnvironmentVariables();
+                .SetBasePath(appEnv.ApplicationBasePath);
+            if (env.IsDevelopment())
+            {
+                builder.AddJsonFile("config_debug.json");
+            }
+            else
+            {
+                builder.AddJsonFile("config.json");
+            }
+            builder.AddEnvironmentVariables();
             Configuration = builder.Build();
             BahamutFireDbUrl = Configuration["Data:BahamutFireDBServer:url"];
             AppUrl = Configuration["Data:App:url"];

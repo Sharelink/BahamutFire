@@ -21,15 +21,9 @@ namespace BahamutFire.APIServer.Controllers
         public async Task<IActionResult> Get(string accessKey)
         {
             var fireService = new FireService(Startup.BahamutFireDbUrl);
-            var akService = new FireAccesskeyService();
             try
             {
-                var info = akService.GetFireAccessInfo(accessKey);
-                if (info.AccessFileAccountId != Request.Headers["accountId"])
-                {
-                    return HttpBadRequest();
-                }
-                var fire = await fireService.GetFireRecord(info.FileId);
+                var fire = await fireService.GetFireRecord(accessKey);
                 if (fire.IsSmallFile)
                 {
                     Response.ContentLength = fire.FileSize;
@@ -54,7 +48,6 @@ namespace BahamutFire.APIServer.Controllers
         [HttpPost]
         public async Task<object> PostOne(string fileType, int fileSize)
         {
-            var akService = new FireAccesskeyService();
             var fService = new FireService(Startup.BahamutFireDbUrl);
             var accountId = Request.Headers["accountId"];
             var newFire = new FireRecord
@@ -67,12 +60,12 @@ namespace BahamutFire.APIServer.Controllers
                 AccountId = accountId,
                 
                 UploadServerUrl = Startup.AppUrl + "/UploadFile",
-                AccessKeyConverter = akService.DefaultConverterName
+                AccessKeyConverter = ""
             };
             var rs = await fService.CreateFireRecord(new FireRecord[] { newFire });
             var r = rs.First();
             var fileId = r.Id.ToString();
-            var accessKey = akService.GetAccesskey(newFire.AccessKeyConverter, accountId, fileId);
+            var accessKey = fileId;
             return new
             {
                 server = newFire.UploadServerUrl,

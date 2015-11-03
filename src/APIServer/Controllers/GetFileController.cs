@@ -18,11 +18,9 @@ namespace BahamutFire.APIServer.Controllers
         public async Task<IActionResult> Index(string accessKey)
         {
             var fireService = new FireService(Startup.BahamutFireDbUrl);
-            var akService = new FireAccesskeyService();
             try
             {
-                var info = akService.GetFireAccessInfo(accessKey);
-                var fire = await fireService.GetFireRecord(info.FileId);
+                var fire = await fireService.GetFireRecord(accessKey);
 
                 if (fire.IsSmallFile)
                 {

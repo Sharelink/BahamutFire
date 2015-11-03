@@ -18,23 +18,16 @@ namespace BahamutFire.APIServer.Controllers
         {
             string accessKey = Request.Headers["accessKey"];
             var fireService = new FireService(Startup.BahamutFireDbUrl);
-            var akService = new FireAccesskeyService();
-            var info = akService.GetFireAccessInfo(accessKey);
 
             var accountId = Request.Headers["accountId"];
-            if (info.AccessFileAccountId != accountId)
-            {
-                return HttpUnauthorized();
-            }
-
-            var fireRecord = await fireService.GetFireRecord(info.FileId);
+            var fireRecord = await fireService.GetFireRecord(accessKey);
             var reader = new BinaryReader(Request.Body);
             var data = reader.ReadBytes(fireRecord.FileSize);
             if (data.Length == fireRecord.FileSize)
             {
-                await fireService.SaveFireData(info.FileId, data);
+                await fireService.SaveFireData(fireRecord.Id.ToString(), data);
                 Console.WriteLine("Fire Save");
-                return Json(new { fileId = info.FileId });
+                return Json(new { fileId = fireRecord.Id.ToString() });
             }
             else
             {
