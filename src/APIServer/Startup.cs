@@ -13,6 +13,7 @@ using BahamutFire.APIServer.Authentication;
 using Microsoft.Dnx.Runtime;
 using ServiceStack.Redis;
 using ServerControlService.Model;
+using NLog;
 
 namespace BahamutFire.APIServer
 {
@@ -47,14 +48,17 @@ namespace BahamutFire.APIServer
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
-            var TokenServerClientManager = new RedisManagerPool(Configuration["Data:TokenServer:url"]);
+
+            var tokenServerUrl = Configuration["Data:TokenServer:url"].Replace("redis://", "");
+            IRedisClientsManager TokenServerClientManager = new PooledRedisClientManager(tokenServerUrl);
             TokenService = new TokenService(TokenServerClientManager);
 
-            var ControlServerServiceClientManager = new RedisManagerPool(Configuration["Data:ControlServiceServer:url"]);
+            var serverControlUrl = Configuration["Data:ControlServiceServer:url"].Replace("redis://", "");
+            IRedisClientsManager ControlServerServiceClientManager = new PooledRedisClientManager(serverControlUrl);
             var serverMgrService = new ServerControlService.Service.ServerControlManagementService(ControlServerServiceClientManager);
             var appInstance = new BahamutAppInstance()
             {
-                Appkey = Startup.Appkey,
+                Appkey = Appkey,
                 InstanceServiceUrl = Configuration["Data:App:url"]
             };
             appInstance = serverMgrService.RegistAppInstance(appInstance);
@@ -68,6 +72,25 @@ namespace BahamutFire.APIServer
         // Configure is called after ConfigureServices is called.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
+            //Log
+            var logConfig = new NLog.Config.LoggingConfiguration();
+            var fileTarget = new NLog.Targets.FileTarget();
+            fileTarget.FileName = Configuration["Data:Log:logFile"];
+            fileTarget.Name = "FileLogger";
+            fileTarget.Layout = @"${date:format=HH\:mm\:ss} ${logger}:${message}";
+            logConfig.AddTarget(fileTarget);
+            logConfig.LoggingRules.Add(new NLog.Config.LoggingRule("*", NLog.LogLevel.Debug, fileTarget));
+            LogManager.Configuration = logConfig;
+
+            if (env.IsDevelopment())
+            {
+                var consoleLogger = new NLog.Targets.ColoredConsoleTarget();
+                consoleLogger.Name = "ConsoleLogger";
+                consoleLogger.Layout = @"${date:format=HH\:mm\:ss} ${logger}:${message}";
+                logConfig.AddTarget(consoleLogger);
+                logConfig.LoggingRules.Add(new NLog.Config.LoggingRule("*", NLog.LogLevel.Debug, consoleLogger));
+            }
+
             // Configure the HTTP request pipeline.
             app.UseStaticFiles();
             // Add MVC to the request pipeline.
@@ -75,6 +98,8 @@ namespace BahamutFire.APIServer
             app.UseMvc();
             // Add the following route for porting Web API 2 controllers.
             // routes.MapWebApiRoute("DefaultApi", "api/{controller}/{id?}");
+
+            LogManager.GetCurrentClassLogger().Info("Toronto Started!");
         }
     }
 }

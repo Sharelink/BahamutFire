@@ -15,6 +15,10 @@
 
     "ControlServiceServer": {
       "url": "redis://app.sharelink.online:6379"
+    },
+
+    "Log": {
+      "logFile": "/home/deployment/logs/BahamutFireAPIServer/8089.log"
     }
   }
 }

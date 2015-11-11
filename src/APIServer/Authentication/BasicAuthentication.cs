@@ -24,7 +24,7 @@ namespace BahamutFire.APIServer.Authentication
             var userId = httpContext.Request.Headers["userId"];
             var token = httpContext.Request.Headers["token"];
             var appkey = httpContext.Request.Headers["appkey"];
-            Console.WriteLine(httpContext.Request.Path);
+            NLog.LogManager.GetCurrentClassLogger().Info("Request:{0}", httpContext.Request.Path);
             var res = Startup.TokenService.ValidateAppToken(appkey, userId, token).Result;
             if(res != null)
             {
@@ -33,6 +33,7 @@ namespace BahamutFire.APIServer.Authentication
             }
             else
             {
+                NLog.LogManager.GetCurrentClassLogger().Info("Validate Failed:{0}", userId);
                 httpContext.Response.StatusCode = (int)HttpStatusCode.Forbidden;
                 return null;
             }
