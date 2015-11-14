@@ -219,3 +219,4 @@ FakesAssemblies/
 **/*.Server/ModelManifest.xml
 _Pvt_Extensions
 src/APIServer/hosting.ini
+src/APIServer/config_debug.json
