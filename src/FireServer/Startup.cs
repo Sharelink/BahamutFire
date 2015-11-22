@@ -6,17 +6,18 @@ using Microsoft.AspNet.Builder;
 using Microsoft.AspNet.Hosting;
 using Microsoft.AspNet.Http;
 using Microsoft.AspNet.Routing;
-using Microsoft.Framework.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using BahamutService;
-using Microsoft.Framework.Configuration;
-using BahamutFire.APIServer.Authentication;
+using Microsoft.Extensions.Configuration;
+using BahamutFire.FireServer.Authentication;
 using Microsoft.Dnx.Runtime;
 using ServiceStack.Redis;
 using ServerControlService.Model;
 using NLog;
 using ServerControlService.Service;
+using Microsoft.Extensions.PlatformAbstractions;
 
-namespace BahamutFire.APIServer
+namespace BahamutFire.FireServer
 {
     public class Startup
     {
@@ -75,10 +76,6 @@ namespace BahamutFire.APIServer
             {
                 LogManager.GetCurrentClassLogger().Error(ex, "Unable To Regist App Instance");
             }
-
-            // Uncomment the following line to add Web API services which makes it easier to port Web API 2 controllers.
-            // You will also need to add the Microsoft.AspNet.Mvc.WebApiCompatShim package to the 'dependencies' section of project.json.
-            // services.AddWebApiConventions();
         }
 
         // Configure is called after ConfigureServices is called.
@@ -107,11 +104,12 @@ namespace BahamutFire.APIServer
             // Add MVC to the request pipeline.
             app.UseMiddleware<BasicAuthentication>(); //must in front of UseMvc
             app.UseMvc();
-            // Add the following route for porting Web API 2 controllers.
-            // routes.MapWebApiRoute("DefaultApi", "api/{controller}/{id?}");
 
             LogManager.GetCurrentClassLogger().Info("Toronto Started!");
         }
+
+        // Entry point for the application.
+        public static void Main(string[] args) => WebApplication.Run<Startup>(args);
 
         private void KeepAliveObserver_OnExpireOnce(object sender, KeepAliveObserverEventArgs e)
         {

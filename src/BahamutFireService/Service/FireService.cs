@@ -5,12 +5,15 @@ using System.Linq;
 using System.Threading.Tasks;
 using MongoDB.Driver;
 using MongoDB.Bson;
+using System.IO;
+using MongoDB.Driver.GridFS;
 
 namespace BahamutFireService.Service
 {
     public class FireService
     {
         private readonly string FireDBName = "BahamutFireDB";
+        private readonly string BigDataFireDBName = "BahamutBigFireDB";
 
         public IMongoClient Client { get; set; }
 
@@ -19,26 +22,41 @@ namespace BahamutFireService.Service
             Client = new MongoClient(new MongoUrl(mongoDbUrl));
         }
 
-        public byte[] GetBigFireData(string fileId)
+        public async Task<GridFSFileInfo> GetBigFire(string fileId)
         {
-            //TODO: complete the big data
-            return null;
+            var bucket = new GridFSBucket(Client.GetDatabase(BigDataFireDBName));
+            var filter = Builders<GridFSFileInfo>.Filter.Eq(f => f.Filename, fileId);
+            var fires = await (await bucket.FindAsync(filter)).ToListAsync();
+            return fires.First();
         }
 
-        public async Task SaveFireData(string fileId, byte[] data)
+        public async Task<GridFSDownloadStream> GetBigFireStream(string fileId)
         {
-            var record = await GetFireRecord(fileId);
-            if (record.IsSmallFile)
-            {
-                var update = new UpdateDefinitionBuilder<FireRecord>().Set(fr => fr.SmallFileData, data).Set(fr => fr.State, (int)FireRecordState.Saved);
-                var collection = Client.GetDatabase(FireDBName).GetCollection<FireRecord>("FireRecord");
-                var fOid = new ObjectId(fileId);
-                await collection.UpdateOneAsync(f => f.Id == fOid, update);
-            }
-            else
-            {
-                //TODO: complete the big data
-            }
+            var bucket = new GridFSBucket(Client.GetDatabase(BigDataFireDBName));
+            var fireStream = await bucket.OpenDownloadStreamByNameAsync(fileId);
+            return fireStream;
+        }
+
+        public async Task<ObjectId> SaveBigFire(string fileName, Stream fireStream)
+        {
+            var bucket = new GridFSBucket(Client.GetDatabase(BigDataFireDBName));
+            return await bucket.UploadFromStreamAsync(fileName, fireStream);
+        }
+
+        public async Task UpdateBigFireId(string fileId, ObjectId bigFireId)
+        {
+            var update = Builders<FireRecord>.Update.Set(fr => fr.BigFireId, bigFireId);
+            var collection = Client.GetDatabase(FireDBName).GetCollection<FireRecord>("FireRecord");
+            var fOid = new ObjectId(fileId);
+            await collection.UpdateOneAsync(f => f.Id == fOid, update);
+        }
+
+        public async Task SaveSmallFire(string fileId, byte[] data)
+        {
+            var update = new UpdateDefinitionBuilder<FireRecord>().Set(fr => fr.SmallFileData, data).Set(fr => fr.State, (int)FireRecordState.Saved);
+            var collection = Client.GetDatabase(FireDBName).GetCollection<FireRecord>("FireRecord");
+            var fOid = new ObjectId(fileId);
+            await collection.UpdateOneAsync(f => f.Id == fOid, update);
         }
 
         public async Task<FireRecord> GetFireRecord(string fileId)

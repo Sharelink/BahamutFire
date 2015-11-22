@@ -24,6 +24,7 @@ namespace BahamutFireCommon
         public string FileType { get; set; }
         public string AccessKeyConverter { get; set; }
         public byte[] SmallFileData { get; set; }
+        public ObjectId BigFireId { get; set; }
         public string UploadServerUrl { get; set; }
     }
 

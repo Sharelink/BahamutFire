@@ -6,7 +6,7 @@ using Microsoft.AspNet.Http;
 using System.Net;
 using BahamutService;
 
-namespace BahamutFire.APIServer.Authentication
+namespace BahamutFire.FireServer.Authentication
 {
 
     // You may need to install the Microsoft.AspNet.Http.Abstractions package into your project
@@ -26,15 +26,15 @@ namespace BahamutFire.APIServer.Authentication
             var appkey = httpContext.Request.Headers["appkey"];
             NLog.LogManager.GetCurrentClassLogger().Info("Request:{0}", httpContext.Request.Path);
             var res = Startup.TokenService.ValidateAppToken(appkey, userId, token).Result;
-            if(res != null)
+            if (res != null)
             {
                 httpContext.Request.Headers["accountId"] = res.AccountId;
                 return _next(httpContext);
             }
             else
             {
+                
                 NLog.LogManager.GetCurrentClassLogger().Info("Validate Failed:{0}", userId);
-                httpContext.Response.StatusCode = (int)HttpStatusCode.Forbidden;
                 return null;
             }
             

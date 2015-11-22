@@ -1,17 +1,18 @@
 {
-    "version": "1.0.0-*",
-    "description": "BahamutFireCommon Class Library",
-    "authors": [ "广杰" ],
-    "tags": [ "" ],
-    "projectUrl": "",
-    "licenseUrl": "",
+  "version": "1.0.0-*",
+  "description": "BahamutFireCommon Class Library",
+  "authors": [ "广杰" ],
+  "tags": [ "" ],
+  "projectUrl": "",
+  "licenseUrl": "",
 
   "dependencies": {
     "BahamutCommon": "1.0.0-*",
-    "DataLevelDefines": "1.0.0-*"
+    "DataLevelDefines": "1.0.0-*",
+    "MongoDB.Driver.GridFS": "2.1.1"
   },
 
-    "frameworks": {
-        "dnx451": { }
-    }
+  "frameworks": {
+    "dnx451": { }
+  }
 }
