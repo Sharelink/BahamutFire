@@ -9,7 +9,7 @@ using System.Net;
 using System.IO;
 using System.Threading;
 
-namespace BahamutFire.FireServer.Controllers
+namespace FireServer.Controllers
 {
     [Route("[controller]")]
     public class FilesController : Controller
@@ -20,21 +20,21 @@ namespace BahamutFire.FireServer.Controllers
         [HttpGet("{accessKey}")]
         public async Task<IActionResult> Get(string accessKey)
         {
-            var fireService = new FireService(Startup.BahamutFireDbUrl);
+            NLog.LogManager.GetCurrentClassLogger().Info("File Get");
             try
             {
+                var fireService = new FireService(Startup.BahamutFireDbUrl);
                 var fire = await fireService.GetFireRecord(accessKey);
                 var fireId = fire.Id.ToString();
                 var contentType = "application/octet-stream";
-                Response.ContentType = contentType;
                 Response.ContentLength = fire.FileSize;
                 if (fire.IsSmallFile)
                 {
-                    Response.StatusCode = (int)HttpStatusCode.OK;
                     return File(fire.SmallFileData, contentType);
                 }
                 else
                 {
+                    Response.ContentType = contentType;
                     return await WriteBigFileResponse(fireService, fireId);
                 }
             }
@@ -84,31 +84,39 @@ namespace BahamutFire.FireServer.Controllers
         [HttpPost]
         public async Task<object> PostOne(string fileType, int fileSize)
         {
-            var fService = new FireService(Startup.BahamutFireDbUrl);
-            var accountId = Request.Headers["accountId"];
-            var newFire = new FireRecord
+            NLog.LogManager.GetCurrentClassLogger().Info("File Post");
+            try
             {
-                CreateTime = DateTime.UtcNow,
-                FileSize = fileSize,
-                FileType = fileType,
-                IsSmallFile = fileSize < 1024 * 256,
-                State = (int)FireRecordState.Create,
-                AccountId = accountId,
-                
-                UploadServerUrl = Startup.AppUrl + "/UploadFile",
-                AccessKeyConverter = ""
-            };
-            var rs = await fService.CreateFireRecord(new FireRecord[] { newFire });
-            var r = rs.First();
-            var fileId = r.Id.ToString();
-            var accessKey = fileId;
-            return new
-            {
-                server = newFire.UploadServerUrl,
-                accessKey = accessKey,
-                fileId = fileId
-            };
+                var fService = new FireService(Startup.BahamutFireDbUrl);
+                var accountId = Request.Headers["accountId"];
+                var newFire = new FireRecord
+                {
+                    CreateTime = DateTime.UtcNow,
+                    FileSize = fileSize,
+                    FileType = fileType,
+                    IsSmallFile = fileSize < 1024 * 256,
+                    State = (int)FireRecordState.Create,
+                    AccountId = accountId,
 
+                    UploadServerUrl = Startup.AppUrl + "/UploadFile",
+                    AccessKeyConverter = ""
+                };
+                var rs = await fService.CreateFireRecord(new FireRecord[] { newFire });
+                var r = rs.First();
+                var fileId = r.Id.ToString();
+                var accessKey = fileId;
+                return new
+                {
+                    server = newFire.UploadServerUrl,
+                    accessKey = accessKey,
+                    fileId = fileId
+                };
+            }
+            catch (Exception ex)
+            {
+                NLog.LogManager.GetCurrentClassLogger().Error(ex.Message);
+                throw;
+            }
         }
 
         // DELETE Files/

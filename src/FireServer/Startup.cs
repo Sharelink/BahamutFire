@@ -1,27 +1,26 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNet.Builder;
 using Microsoft.AspNet.Hosting;
-using Microsoft.AspNet.Http;
-using Microsoft.AspNet.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using BahamutService;
 using Microsoft.Extensions.Configuration;
-using BahamutFire.FireServer.Authentication;
-using Microsoft.Dnx.Runtime;
 using ServiceStack.Redis;
 using ServerControlService.Model;
 using NLog;
 using ServerControlService.Service;
 using Microsoft.Extensions.PlatformAbstractions;
+using FireServer.Authentication;
 
-namespace BahamutFire.FireServer
+namespace FireServer
 {
     public class Startup
     {
         private readonly IConfiguration Configuration;
+        public static TokenService TokenService { private set; get; }
+        public static ServerControlManagementService ServerControlMgrService { get; set; }
+        public static string BahamutFireDbUrl { get; private set; }
+        public static string Appkey { get; private set; }
+        public static string AppUrl { get; private set; }
 
         public Startup(IHostingEnvironment env, IApplicationEnvironment appEnv)
         {
@@ -41,11 +40,7 @@ namespace BahamutFire.FireServer
             AppUrl = Configuration["Data:App:url"];
             Appkey = Configuration["Data:App:appkey"];
         }
-        public static TokenService TokenService { private set; get; }
-        public static ServerControlManagementService ServerControlMgrService { get; set; }
-        public static string BahamutFireDbUrl { get; private set; }
-        public static string Appkey { get; private set; }
-        public static string AppUrl { get; private set; }
+
         // This method gets called by a runtime.
         // Use this method to add services to the container
         public void ConfigureServices(IServiceCollection services)
@@ -100,12 +95,14 @@ namespace BahamutFire.FireServer
             LogManager.Configuration = logConfig;
 
             // Configure the HTTP request pipeline.
-            app.UseStaticFiles();
-            // Add MVC to the request pipeline.
+            
+            //Add authentication
             app.UseMiddleware<BasicAuthentication>(); //must in front of UseMvc
+
+            // Add MVC to the request pipeline.
             app.UseMvc();
 
-            LogManager.GetCurrentClassLogger().Info("Toronto Started!");
+            LogManager.GetCurrentClassLogger().Info("Fire Started!");
         }
 
         // Entry point for the application.
