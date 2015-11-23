@@ -20,7 +20,6 @@ namespace FireServer.Controllers
         [HttpGet("{accessKey}")]
         public async Task<IActionResult> Get(string accessKey)
         {
-            NLog.LogManager.GetCurrentClassLogger().Info("File Get");
             try
             {
                 var fireService = new FireService(Startup.BahamutFireDbUrl);
