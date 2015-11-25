@@ -4,7 +4,7 @@
     "App": {
       "appname": "BahamutFireAPIServer",
       "appkey": "b078082bd9d5c63da1b4c5d546a9fa44b6c879b2",
-      "url": "http://192.168.1.168:8089"
+      "url": "http://192.168.1.67:8089"
     },
     "BahamutFireDBServer": {
       "url": "mongodb://filedb.sharelink.online:27017"
