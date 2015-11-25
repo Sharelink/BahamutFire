@@ -53,7 +53,7 @@ namespace FireServer.Controllers
                     server = newFire.UploadServerUrl,
                     accessKey = newFire.Id.ToString(),
                     bucket = aliOssInfo.Bucket,
-                    type = AliOSSFileInfo.AliOssServerType,
+                    serverType = AliOSSFileInfo.AliOssServerType,
                     expireAt = DateTimeUtil.ToString(DateTime.UtcNow.AddDays(7))
                 };
             }

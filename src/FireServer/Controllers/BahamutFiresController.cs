@@ -34,7 +34,7 @@ namespace FireServer.Controllers
                     server = fireRecord.UploadServerUrl,
                     accessKey = fireRecord.Id.ToString(),
                     bucket = bucket,
-                    type = fireRecord.ServerType,
+                    serverType = fireRecord.ServerType,
                     expireAt = DateTimeUtil.ToString(DateTime.UtcNow.AddDays(7))
                 };
             }

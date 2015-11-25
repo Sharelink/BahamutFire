@@ -22,7 +22,7 @@
     },
 
     "AliOSS": {
-      "url": "fire-sz-0.oss-cn-shenzhen.aliyuncs.com",
+      "url": "http://oss-cn-shenzhen.aliyuncs.com",
       "bucket": "fire-sz-0"
     }
   }
