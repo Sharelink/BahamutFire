@@ -66,7 +66,13 @@ namespace BahamutFireService.Service
             return await collection.Find(fr => fr.Id == oId).SingleAsync();
         }
 
-        public async Task<IEnumerable<FireRecord>> CreateFireRecord(IEnumerable<FireRecord> newFireRecords)
+        public async Task<FireRecord> CreateFireRecord(FireRecord newFireRecord)
+        {
+            await Client.GetDatabase(FireDBName).GetCollection<FireRecord>("FireRecord").InsertOneAsync(newFireRecord);
+            return newFireRecord;
+        }
+
+        public async Task<IEnumerable<FireRecord>> CreateFireRecords(IEnumerable<FireRecord> newFireRecords)
         {
             await Client.GetDatabase(FireDBName).GetCollection<FireRecord>("FireRecord").InsertManyAsync(newFireRecords);
             return newFireRecords;

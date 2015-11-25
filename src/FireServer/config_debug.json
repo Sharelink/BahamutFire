@@ -19,6 +19,11 @@
 
     "Log": {
       "logFile": "c:/logs/BahamutFireAPIServer/8089.log"
+    },
+
+    "AliOSS": {
+      "url": "fire-sz-0.oss-cn-shenzhen.aliyuncs.com",
+      "bucket": "fire-sz-0"
     }
   }
 }

@@ -100,8 +100,7 @@ namespace FireServer.Controllers
                     UploadServerUrl = Startup.AppUrl + "/UploadFile",
                     AccessKeyConverter = ""
                 };
-                var rs = await fService.CreateFireRecord(new FireRecord[] { newFire });
-                var r = rs.First();
+                var r = await fService.CreateFireRecord(newFire);
                 var fileId = r.Id.ToString();
                 var accessKey = fileId;
                 return new
