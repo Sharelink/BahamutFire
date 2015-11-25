@@ -30,7 +30,7 @@ namespace FireServer.Controllers
                 var accountId = Request.Headers["accountId"];
                 var aliOssInfo = new AliOSSFileInfo()
                 {
-                    Bucket = Startup.Configuration["AliOSS:bucket"]
+                    Bucket = Startup.Configuration["Data:AliOSS:bucket"]
                 };
                 var newFire = new FireRecord()
                 {
@@ -41,7 +41,7 @@ namespace FireServer.Controllers
                     State = (int)FireRecordState.Create,
                     AccountId = accountId,
                     AccessKeyConverter = "",
-                    UploadServerUrl = Startup.Configuration["AliOSS:url"],
+                    UploadServerUrl = Startup.Configuration["Data:AliOSS:url"],
                     ServerType = AliOSSFileInfo.AliOssServerType,
                     Extra = Newtonsoft.Json.JsonConvert.SerializeObject(aliOssInfo)
                 };
