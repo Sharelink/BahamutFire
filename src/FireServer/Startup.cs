@@ -65,6 +65,7 @@ namespace FireServer
                 var observer = ServerControlMgrService.StartKeepAlive(appInstance);
                 observer.OnExpireError += KeepAliveObserver_OnExpireError;
                 observer.OnExpireOnce += KeepAliveObserver_OnExpireOnce;
+                LogManager.GetLogger("FireServer").Info("Bahamut App Instance:" + appInstance.Id.ToString());
                 LogManager.GetLogger("KeepAlive").Info("Keep Server Instance Alive To Server Controller Thread Started!");
             }
             catch (Exception ex)
@@ -110,7 +111,7 @@ namespace FireServer
 
         private void KeepAliveObserver_OnExpireOnce(object sender, KeepAliveObserverEventArgs e)
         {
-            LogManager.GetLogger("KeepAlive").Info(string.Format("Expired Instance:{0}", e.Instance.Id));
+
         }
 
         private void KeepAliveObserver_OnExpireError(object sender, KeepAliveObserverEventArgs e)
