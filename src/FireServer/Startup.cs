@@ -45,7 +45,9 @@ namespace FireServer
         // Use this method to add services to the container
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc();
+            services.AddMvc(config => {
+                config.Filters.Add(new LogExceptionFilter());
+            });
 
             var tokenServerUrl = Configuration["Data:TokenServer:url"].Replace("redis://", "");
             IRedisClientsManager TokenServerClientManager = new PooledRedisClientManager(tokenServerUrl);
@@ -82,14 +84,14 @@ namespace FireServer
             var fileTarget = new NLog.Targets.FileTarget();
             fileTarget.FileName = Configuration["Data:Log:logFile"];
             fileTarget.Name = "FileLogger";
-            fileTarget.Layout = @"${date:format=HH\:mm\:ss} ${logger}:${message};${exception}";
+            fileTarget.Layout = @"${date:format=yyyy-MM-dd HH\:mm\:ss} ${logger}:${message};${exception}";
             logConfig.AddTarget(fileTarget);
             logConfig.LoggingRules.Add(new NLog.Config.LoggingRule("*", NLog.LogLevel.Debug, fileTarget));
             if (env.IsDevelopment())
             {
                 var consoleLogger = new NLog.Targets.ColoredConsoleTarget();
                 consoleLogger.Name = "ConsoleLogger";
-                consoleLogger.Layout = @"${date:format=HH\:mm\:ss} ${logger}:${message};${exception}";
+                consoleLogger.Layout = @"${date:format=yyyy-MM-dd HH\:mm\:ss} ${logger}:${message};${exception}";
                 logConfig.AddTarget(consoleLogger);
                 logConfig.LoggingRules.Add(new NLog.Config.LoggingRule("*", NLog.LogLevel.Debug, consoleLogger));
             }
