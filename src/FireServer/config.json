@@ -29,35 +29,35 @@
           "layoutFormat": "${date:format=yyyy-MM-dd HH\\:mm\\:ss} ${logger}:${level:uppercase=true}:${message};${exception}",
           "namePattern": "Main",
           "minLevel": "Debug",
-          "fileName": "c:/logs/FireServer/8089/main.log"
+          "fileName": "/home/deployment/logs/FireServer/8089/main.log"
         },
         {
           "name": "Route",
           "layoutFormat": "${date:format=yyyy-MM-dd HH\\:mm\\:ss} ${message}",
           "namePattern": "Route",
           "logLevel": "Info",
-          "fileName": "c:/logs/FireServer/8089/route.log"
+          "fileName": "/home/deployment/logs/FireServer/8089/route.log"
         },
         {
           "name": "Error",
           "layoutFormat": "${date:format=yyyy-MM-dd HH\\:mm\\:ss} ${logger}:${message}->${exception}",
           "namePattern": "*",
           "logLevel": "Error",
-          "fileName": "c:/logs/FireServer/8089/error.log"
+          "fileName": "/home/deployment/logs/FireServer/8089/error.log"
         },
         {
           "name": "Info",
           "layoutFormat": "${date:format=yyyy-MM-dd HH\\:mm\\:ss} ${message}",
           "namePattern": "Info",
           "logLevel": "Info",
-          "fileName": "c:/logs/FireServer/8089/info.log"
+          "fileName": "/home/deployment/logs/FireServer/8089/info.log"
         },
         {
           "name": "Warning",
           "layoutFormat": "${date:format=yyyy-MM-dd HH\\:mm\\:ss} ${logger}:${message}",
           "namePattern": "*",
           "logLevel": "Warn",
-          "fileName": "c:/logs/FireServer/8089/warning.log"
+          "fileName": "/home/deployment/logs/FireServer/8089/warning.log"
         }
       ]
     }
