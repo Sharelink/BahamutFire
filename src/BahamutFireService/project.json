@@ -7,7 +7,6 @@
     "licenseUrl": "",
 
   "dependencies": {
-    "BahamutCommon": "1.0.0-*",
     "BahamutFireCommon": "1.0.0-*"
   },
 

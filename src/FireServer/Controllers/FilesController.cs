@@ -39,7 +39,7 @@ namespace FireServer.Controllers
             }
             catch (Exception ex)
             {
-                NLog.LogManager.GetCurrentClassLogger().Warn(ex, "AccessKey Not Found:{0}", accessKey);
+                NLog.LogManager.GetLogger("Warning").Warn(ex, "AccessKey Not Found:{0}", accessKey);
                 return HttpNotFound();
             }
         }
@@ -71,7 +71,7 @@ namespace FireServer.Controllers
             }
             catch (Exception ex)
             {
-                NLog.LogManager.GetCurrentClassLogger().Error(ex, "Open Big Fire Stream Failed{0}", fireId);
+                NLog.LogManager.GetLogger("Warning").Warn(ex, "Open Big Fire Stream Failed{0}", fireId);
                 Response.StatusCode = (int)HttpStatusCode.InternalServerError;
                 throw;
             }
@@ -112,7 +112,7 @@ namespace FireServer.Controllers
             }
             catch (Exception ex)
             {
-                NLog.LogManager.GetCurrentClassLogger().Error(ex.Message);
+                NLog.LogManager.GetLogger("Warning").Warn(ex.Message);
                 throw;
             }
         }

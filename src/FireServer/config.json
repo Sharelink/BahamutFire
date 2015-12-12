@@ -2,7 +2,7 @@
 
   "Data": {
     "App": {
-      "appname": "BahamutFireAPIServer",
+      "appname": "FireServer",
       "appkey": "b078082bd9d5c63da1b4c5d546a9fa44b6c879b2",
       "url": "http://file.sharelink.online:8089"
     },
@@ -17,13 +17,49 @@
       "url": "redis://$psw@app.sharelink.online:6733"
     },
 
-    "Log": {
-      "logFile": "/home/deployment/logs/BahamutFireAPIServer/8089.log"
-    },
-
     "AliOSS": {
       "url": "http://oss-cn-shenzhen.aliyuncs.com",
       "bucket": "fire-sz-0"
+    },
+
+    "Log": {
+      "fileLoggers": [
+        {
+          "name": "Main",
+          "layoutFormat": "${date:format=yyyy-MM-dd HH\\:mm\\:ss} ${logger}:${level:uppercase=true}:${message};${exception}",
+          "namePattern": "Main",
+          "minLevel": "Debug",
+          "fileName": "c:/logs/FireServer/8089/main.log"
+        },
+        {
+          "name": "Route",
+          "layoutFormat": "${date:format=yyyy-MM-dd HH\\:mm\\:ss} ${message}",
+          "namePattern": "Route",
+          "logLevel": "Info",
+          "fileName": "c:/logs/FireServer/8089/route.log"
+        },
+        {
+          "name": "Error",
+          "layoutFormat": "${date:format=yyyy-MM-dd HH\\:mm\\:ss} ${logger}:${message}->${exception}",
+          "namePattern": "*",
+          "logLevel": "Error",
+          "fileName": "c:/logs/FireServer/8089/error.log"
+        },
+        {
+          "name": "Info",
+          "layoutFormat": "${date:format=yyyy-MM-dd HH\\:mm\\:ss} ${message}",
+          "namePattern": "Info",
+          "logLevel": "Info",
+          "fileName": "c:/logs/FireServer/8089/info.log"
+        },
+        {
+          "name": "Warning",
+          "layoutFormat": "${date:format=yyyy-MM-dd HH\\:mm\\:ss} ${logger}:${message}",
+          "namePattern": "*",
+          "logLevel": "Warn",
+          "fileName": "c:/logs/FireServer/8089/warning.log"
+        }
+      ]
     }
   }
 }

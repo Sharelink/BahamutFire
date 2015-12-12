@@ -9,7 +9,9 @@ using ServerControlService.Model;
 using NLog;
 using ServerControlService.Service;
 using Microsoft.Extensions.PlatformAbstractions;
-using FireServer.Authentication;
+using NLog.Config;
+using BahamutCommon;
+using BahamutAspNetCommon;
 
 namespace FireServer
 {
@@ -49,6 +51,8 @@ namespace FireServer
                 config.Filters.Add(new LogExceptionFilter());
             });
 
+            services.AddScoped<LogExceptionFilter>();
+
             var tokenServerUrl = Configuration["Data:TokenServer:url"].Replace("redis://", "");
             IRedisClientsManager TokenServerClientManager = new PooledRedisClientManager(tokenServerUrl);
             TokenService = new TokenService(TokenServerClientManager);
@@ -67,12 +71,12 @@ namespace FireServer
                 var observer = ServerControlMgrService.StartKeepAlive(appInstance);
                 observer.OnExpireError += KeepAliveObserver_OnExpireError;
                 observer.OnExpireOnce += KeepAliveObserver_OnExpireOnce;
-                LogManager.GetLogger("FireServer").Info("Bahamut App Instance:" + appInstance.Id.ToString());
-                LogManager.GetLogger("KeepAlive").Info("Keep Server Instance Alive To Server Controller Thread Started!");
+                LogManager.GetLogger("Main").Info("Bahamut App Instance:" + appInstance.Id.ToString());
+                LogManager.GetLogger("Main").Info("Keep Server Instance Alive To Server Controller Thread Started!");
             }
             catch (Exception ex)
             {
-                LogManager.GetCurrentClassLogger().Error(ex, "Unable To Regist App Instance");
+                LogManager.GetLogger("Main").Error(ex, "Unable To Regist App Instance");
             }
         }
 
@@ -80,32 +84,24 @@ namespace FireServer
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
             //Log
-            var logConfig = new NLog.Config.LoggingConfiguration();
-            var fileTarget = new NLog.Targets.FileTarget();
-            fileTarget.FileName = Configuration["Data:Log:logFile"];
-            fileTarget.Name = "FileLogger";
-            fileTarget.Layout = @"${date:format=yyyy-MM-dd HH\:mm\:ss} ${logger}:${message};${exception}";
-            logConfig.AddTarget(fileTarget);
-            logConfig.LoggingRules.Add(new NLog.Config.LoggingRule("*", NLog.LogLevel.Debug, fileTarget));
+            var logConfig = new LoggingConfiguration();
+            LoggerLoaderHelper.LoadLoggerToLoggingConfig(logConfig, Configuration, "Data:Log:fileLoggers");
+
             if (env.IsDevelopment())
             {
-                var consoleLogger = new NLog.Targets.ColoredConsoleTarget();
-                consoleLogger.Name = "ConsoleLogger";
-                consoleLogger.Layout = @"${date:format=yyyy-MM-dd HH\:mm\:ss} ${logger}:${message};${exception}";
-                logConfig.AddTarget(consoleLogger);
-                logConfig.LoggingRules.Add(new NLog.Config.LoggingRule("*", NLog.LogLevel.Debug, consoleLogger));
+                LoggerLoaderHelper.AddConsoleLoggerToLogginConfig(logConfig);
             }
             LogManager.Configuration = logConfig;
 
             // Configure the HTTP request pipeline.
-            
-            //Add authentication
-            app.UseMiddleware<BasicAuthentication>(); //must in front of UseMvc
+
+            //Authentication
+            app.UseMiddleware<TokenAuthentication>(Appkey, TokenService);
 
             // Add MVC to the request pipeline.
             app.UseMvc();
 
-            LogManager.GetCurrentClassLogger().Info("Fire Started!");
+            LogManager.GetLogger("Main").Info("Fire Started!");
         }
 
         // Entry point for the application.
@@ -118,7 +114,7 @@ namespace FireServer
 
         private void KeepAliveObserver_OnExpireError(object sender, KeepAliveObserverEventArgs e)
         {
-            LogManager.GetLogger("KeepAlive").Error(string.Format("Expire Server Error.Instance:{0}", e.Instance.Id), e);
+            LogManager.GetLogger("Main").Error(string.Format("Expire Server Error.Instance:{0}", e.Instance.Id), e);
             ServerControlMgrService.ReActiveAppInstance(e.Instance);
         }
     }

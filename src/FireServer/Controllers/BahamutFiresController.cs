@@ -40,7 +40,7 @@ namespace FireServer.Controllers
             }
             catch (Exception ex)
             {
-                NLog.LogManager.GetCurrentClassLogger().Warn(ex, "AccessKey Not Found:{0}", accessKey);
+                NLog.LogManager.GetLogger("Warning").Warn(ex, "AccessKey Not Found:{0}", accessKey);
                 return HttpNotFound();
             }
         }

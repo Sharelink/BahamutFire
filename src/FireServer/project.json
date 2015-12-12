@@ -10,7 +10,7 @@
     "Microsoft.Extensions.Configuration.Json": "1.0.0-*",
     "BahamutFireService": "1.0.0-*",
     "ServerControlService": "1.0.0-*",
-    "BahamutService": "1.0.0-*"
+    "BahamutAspNetCommon": "1.0.0-*"
   },
 
   "commands": {

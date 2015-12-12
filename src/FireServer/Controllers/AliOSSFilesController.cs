@@ -59,7 +59,7 @@ namespace FireServer.Controllers
             }
             catch (Exception ex)
             {
-                NLog.LogManager.GetCurrentClassLogger().Warn(ex, "Add New Fire Error:{0}", ex.Message);
+                NLog.LogManager.GetLogger("Warn").Warn(ex, "Add New Fire Error:{0}", ex.Message);
                 return HttpNotFound();
             }
         }
