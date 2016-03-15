@@ -35,7 +35,7 @@ namespace FireServer.Controllers
             return fireObj;
         }
 
-        private FireRecord GenerateNewFireRecord(string fileType,int fileSize,string accountId,string bucket)
+        private FireRecord GenerateNewFireRecord(string fileType,int fileSize,string accountId,string uploadUrl,string bucket)
         {
             var aliOssInfo = new AliOSSFileInfo()
             {
@@ -50,7 +50,7 @@ namespace FireServer.Controllers
                 State = (int)FireRecordState.Create,
                 AccountId = accountId,
                 AccessKeyConverter = "",
-                UploadServerUrl = Startup.Configuration["Data:AliOSS:url"],
+                UploadServerUrl = uploadUrl,
                 ServerType = AliOSSFileInfo.AliOssServerType,
                 Extra = Newtonsoft.Json.JsonConvert.SerializeObject(aliOssInfo)
             };
@@ -62,7 +62,12 @@ namespace FireServer.Controllers
         {
             try
             {
-                var bucket = Startup.Configuration["Data:AliOSS:bucket"];
+                var appkey = HttpContext.Request.Headers["appkey"];
+                var bucketKey = string.Format("Data:AliOSS:{0}:bucket", appkey);
+                var uploadUrlKey = string.Format("Data:AliOSS:{0}:url", appkey);
+                var bucket = Startup.Configuration[bucketKey];
+                var uploadUrl = Startup.Configuration[uploadUrlKey];
+
                 var fireService = new FireService(Startup.BahamutFireDbUrl);
                 var accountId = Request.Headers["accountId"];
 
@@ -75,7 +80,7 @@ namespace FireServer.Controllers
                 var newFires = new List<FireRecord>();
                 for (int i = 0; i < fileTypeList.Count(); i++)
                 {
-                    var fire = GenerateNewFireRecord(fileTypeList[i], int.Parse(fileSizeList[i]), accountId, bucket);
+                    var fire = GenerateNewFireRecord(fileTypeList[i], int.Parse(fileSizeList[i]), accountId, uploadUrl, bucket);
                     newFires.Add(fire);
                 }
                 var records = await fireService.CreateFireRecords(newFires);
@@ -98,10 +103,14 @@ namespace FireServer.Controllers
         {
             try
             {
-                var bucket = Startup.Configuration["Data:AliOSS:bucket"];
+                var appkey = HttpContext.Request.Headers["appkey"];
+                var bucketKey = string.Format("Data:AliOSS:{0}:bucket", appkey);
+                var uploadUrlKey = string.Format("Data:AliOSS:{0}:url", appkey);
+                var bucket = Startup.Configuration[bucketKey];
+                var uploadUrl = Startup.Configuration[uploadUrlKey];
                 var fireService = new FireService(Startup.BahamutFireDbUrl);
                 var accountId = Request.Headers["accountId"];
-                var newFire = GenerateNewFireRecord(fileType, fileSize, accountId, bucket);
+                var newFire = GenerateNewFireRecord(fileType, fileSize, accountId, uploadUrl, bucket);
                 newFire = await fireService.CreateFireRecord(newFire);
                 return FireRecordToObject(newFire, bucket);
             }

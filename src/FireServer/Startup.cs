@@ -28,16 +28,18 @@ namespace FireServer
         {
             var builder = new ConfigurationBuilder()
                 .SetBasePath(appEnv.ApplicationBasePath);
+            var configFile = "";
             if (env.IsDevelopment())
             {
-                builder.AddJsonFile("config_debug.json");
+                configFile = "config_debug.json";
             }
             else
             {
-                builder.AddJsonFile("/etc/bahamut/fire.json");
+                configFile = "/etc/bahamut/fire.json";
             }
-            builder.AddEnvironmentVariables();
-            Configuration = builder.Build();
+            builder.AddJsonFile(configFile).AddEnvironmentVariables();
+            Configuration = builder.Build().ReloadOnChanged(configFile);
+            
             BahamutFireDbUrl = Configuration["Data:BahamutFireDBServer:url"];
             AppUrl = Configuration["Data:App:url"];
             Appkey = Configuration["Data:App:appkey"];

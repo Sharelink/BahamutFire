@@ -18,8 +18,10 @@
     },
 
     "AliOSS": {
-      "url": "http://oss-cn-shenzhen.aliyuncs.com",
-      "bucket": "fire-sz-0"
+      "appkey": {
+        "url": "http://xx.com",
+        "bucket": "xx"
+      }
     },
 
     "Log": {
