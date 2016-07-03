@@ -1,6 +1,6 @@
 ﻿using System;
-using Microsoft.AspNet.Builder;
-using Microsoft.AspNet.Hosting;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using BahamutService;
 using Microsoft.Extensions.Configuration;
@@ -12,9 +12,29 @@ using Microsoft.Extensions.PlatformAbstractions;
 using NLog.Config;
 using BahamutCommon;
 using BahamutAspNetCommon;
+using System.IO;
 
 namespace FireServer
 {
+    public class Program
+    {
+        public static void Main(string[] args)
+        {
+            var configuration = new ConfigurationBuilder()
+            .AddCommandLine(args)
+            .Build();
+
+            var host = new WebHostBuilder()
+                .UseKestrel()
+                .UseConfiguration(configuration)
+                .UseContentRoot(Directory.GetCurrentDirectory())
+                .UseStartup<Startup>()
+                .Build();
+
+            host.Run();
+        }
+    }
+
     public class Startup
     {
         public static IConfiguration Configuration { private set; get; }
@@ -24,10 +44,10 @@ namespace FireServer
         public static string Appkey { get; private set; }
         public static string AppUrl { get; private set; }
 
-        public Startup(IHostingEnvironment env, IApplicationEnvironment appEnv)
+        public Startup(IHostingEnvironment env)
         {
             var builder = new ConfigurationBuilder()
-                .SetBasePath(appEnv.ApplicationBasePath);
+                .SetBasePath(env.ContentRootPath);
             var configFile = "";
             if (env.IsDevelopment())
             {
@@ -37,8 +57,8 @@ namespace FireServer
             {
                 configFile = "/etc/bahamut/fire.json";
             }
-            builder.AddJsonFile(configFile).AddEnvironmentVariables();
-            Configuration = builder.Build().ReloadOnChanged(configFile);
+            builder.AddJsonFile(configFile,true,true).AddEnvironmentVariables();
+            Configuration = builder.Build();
             
             BahamutFireDbUrl = Configuration["Data:BahamutFireDBServer:url"];
             AppUrl = Configuration["Data:App:url"];
@@ -105,9 +125,6 @@ namespace FireServer
 
             LogManager.GetLogger("Main").Info("Fire Started!");
         }
-
-        // Entry point for the application.
-        public static void Main(string[] args) => WebApplication.Run<Startup>(args);
 
         private void KeepAliveObserver_OnExpireOnce(object sender, KeepAliveObserverEventArgs e)
         {

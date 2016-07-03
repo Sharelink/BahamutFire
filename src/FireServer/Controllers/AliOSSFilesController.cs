@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNet.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using BahamutFireService.Service;
 using BahamutFireCommon;
 using BahamutCommon;
@@ -117,7 +117,7 @@ namespace FireServer.Controllers
             catch (Exception ex)
             {
                 NLog.LogManager.GetLogger("Warn").Warn(ex, "Add New Fire Error:{0}", ex.Message);
-                return HttpNotFound();
+                return StatusCode(404);
             }
         }
     }

@@ -1,16 +1,12 @@
 {
     "version": "1.0.0-*",
     "description": "BahamutFireService Class Library",
-    "authors": [ "广杰" ],
-    "tags": [ "" ],
-    "projectUrl": "",
-    "licenseUrl": "",
 
   "dependencies": {
     "BahamutFireCommon": "1.0.0-*"
   },
 
     "frameworks": {
-        "dnx451": { }
+        "net451": { }
     }
 }

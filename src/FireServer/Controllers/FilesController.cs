@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNet.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using BahamutFireService.Service;
 using BahamutFireCommon;
 using System.Net;
@@ -40,7 +40,7 @@ namespace FireServer.Controllers
             catch (Exception ex)
             {
                 NLog.LogManager.GetLogger("Warning").Warn(ex, "AccessKey Not Found:{0}", accessKey);
-                return HttpNotFound();
+                return StatusCode(404);
             }
         }
 
@@ -67,7 +67,7 @@ namespace FireServer.Controllers
                         }
                     }
                 });
-                return Ok();
+                return StatusCode(200);
             }
             catch (Exception ex)
             {

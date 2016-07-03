@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.AspNet.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using BahamutFireService.Service;
 using System.IO;
 using System.Threading.Tasks;
+using System.Net;
 
 // For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -36,7 +37,7 @@ namespace FireServer.Controllers
                     }
                     else
                     {
-                        return HttpBadRequest();
+                        return StatusCode((int)HttpStatusCode.BadRequest);
                     }
                 }
                 else
