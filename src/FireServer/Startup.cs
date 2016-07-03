@@ -13,6 +13,7 @@ using NLog.Config;
 using BahamutCommon;
 using BahamutAspNetCommon;
 using System.IO;
+using Newtonsoft.Json.Serialization;
 
 namespace FireServer
 {
@@ -71,6 +72,9 @@ namespace FireServer
         {
             services.AddMvc(config => {
                 config.Filters.Add(new LogExceptionFilter());
+            }).AddJsonOptions(x =>
+            {
+                x.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
             });
 
             services.AddScoped<LogExceptionFilter>();
