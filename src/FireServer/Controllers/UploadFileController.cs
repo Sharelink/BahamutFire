@@ -37,7 +37,8 @@ namespace FireServer.Controllers
                     }
                     else
                     {
-                        return StatusCode((int)HttpStatusCode.BadRequest);
+                        Response.StatusCode = (int)HttpStatusCode.BadRequest;
+                        return Json(new { msg = "CREATE_UPLOAD_TASK_ERROR"});
                     }
                 }
                 else

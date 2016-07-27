@@ -41,7 +41,8 @@ namespace FireServer.Controllers
             catch (Exception ex)
             {
                 NLog.LogManager.GetLogger("Warning").Warn(ex, "AccessKey Not Found:{0}", accessKey);
-                return StatusCode(404);
+                Response.StatusCode = 404;
+                return new { msg = "ACCESS_KEY_NOT_FOUND" };
             }
         }
     }

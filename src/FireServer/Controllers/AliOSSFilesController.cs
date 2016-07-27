@@ -117,7 +117,8 @@ namespace FireServer.Controllers
             catch (Exception ex)
             {
                 NLog.LogManager.GetLogger("Warn").Warn(ex, "Add New Fire Error:{0}", ex.Message);
-                return StatusCode(404);
+                Response.StatusCode = 400;
+                return new { msg = "CREATE_FILE_ERROR" };
             }
         }
     }
