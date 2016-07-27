@@ -22,6 +22,10 @@ namespace FireServer.Controllers
                 var fireService = new FireService(Startup.BahamutFireDbUrl);
                 var accountId = Request.Headers["accountId"];
                 var fireRecord = await fireService.GetFireRecord(fileId);
+                if (null == fireRecord)
+                {
+                    throw new Exception();
+                }
                 var bucket = "";
                 if (AliOSSFileInfo.AliOssServerType == fireRecord.ServerType)
                 {
@@ -40,7 +44,7 @@ namespace FireServer.Controllers
             }
             catch (Exception ex)
             {
-                NLog.LogManager.GetLogger("Warning").Warn(ex, "AccessKey Not Found:{0}", accessKey);
+                NLog.LogManager.GetLogger("Warning").Warn(ex, "Access Key Not Found:{0}", accessKey);
                 Response.StatusCode = 404;
                 return new { msg = "ACCESS_KEY_NOT_FOUND" };
             }

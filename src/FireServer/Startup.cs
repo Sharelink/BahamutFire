@@ -39,11 +39,12 @@ namespace FireServer
     public class Startup
     {
         public static IConfiguration Configuration { private set; get; }
-        public static TokenService TokenService { private set; get; }
-        public static ServerControlManagementService ServerControlMgrService { get; set; }
+        //public static TokenService TokenService { private set; get; }
+       // public static ServerControlManagementService ServerControlMgrService { get; set; }
         public static string BahamutFireDbUrl { get; private set; }
         public static string Appkey { get; private set; }
         public static string AppUrl { get; private set; }
+        public static IServiceProvider AppServiceProvider { get; private set; }
 
         public Startup(IHostingEnvironment env)
         {
@@ -81,11 +82,13 @@ namespace FireServer
 
             var tokenServerUrl = Configuration["Data:TokenServer:url"].Replace("redis://", "");
             IRedisClientsManager TokenServerClientManager = new PooledRedisClientManager(tokenServerUrl);
-            TokenService = new TokenService(TokenServerClientManager);
+            var tokenService = new TokenService(TokenServerClientManager);
+            services.AddSingleton(tokenService);
 
             var serverControlUrl = Configuration["Data:ControlServiceServer:url"].Replace("redis://", "");
             IRedisClientsManager ControlServerServiceClientManager = new PooledRedisClientManager(serverControlUrl);
-            ServerControlMgrService = new ServerControlManagementService(ControlServerServiceClientManager);
+            var serverControlMgrService = new ServerControlManagementService(ControlServerServiceClientManager);
+            services.AddSingleton(serverControlMgrService);
             var appInstance = new BahamutAppInstance()
             {
                 Appkey = Appkey,
@@ -93,8 +96,8 @@ namespace FireServer
             };
             try
             {
-                appInstance = ServerControlMgrService.RegistAppInstance(appInstance);
-                var observer = ServerControlMgrService.StartKeepAlive(appInstance);
+                appInstance = serverControlMgrService.RegistAppInstance(appInstance);
+                var observer = serverControlMgrService.StartKeepAlive(appInstance);
                 observer.OnExpireError += KeepAliveObserver_OnExpireError;
                 observer.OnExpireOnce += KeepAliveObserver_OnExpireOnce;
                 LogManager.GetLogger("Main").Info("Bahamut App Instance:" + appInstance.Id.ToString());
@@ -109,6 +112,7 @@ namespace FireServer
         // Configure is called after ConfigureServices is called.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
+            AppServiceProvider = app.ApplicationServices;
             //Log
             var logConfig = new LoggingConfiguration();
             LoggerLoaderHelper.LoadLoggerToLoggingConfig(logConfig, Configuration, "Data:Log:fileLoggers");
@@ -122,7 +126,7 @@ namespace FireServer
             // Configure the HTTP request pipeline.
 
             //Authentication
-            app.UseMiddleware<TokenAuthentication>(Appkey, TokenService);
+            app.UseMiddleware<TokenAuthentication>(Appkey, AppServiceProvider.GetService<TokenService>());
 
             // Add MVC to the request pipeline.
             app.UseMvc();
@@ -138,7 +142,20 @@ namespace FireServer
         private void KeepAliveObserver_OnExpireError(object sender, KeepAliveObserverEventArgs e)
         {
             LogManager.GetLogger("Main").Error(string.Format("Expire Server Error.Instance:{0}", e.Instance.Id), e);
-            ServerControlMgrService.ReActiveAppInstance(e.Instance);
+            AppServiceProvider.GetServerControlManagementService().ReActiveAppInstance(e.Instance);
+        }
+    }
+
+    public static class IGetAppService
+    {
+        public static ServerControlManagementService GetServerControlManagementService(this IServiceProvider provider)
+        {
+            return provider.GetService<ServerControlManagementService>();
+        }
+
+        public static TokenService GetTokenService(this IServiceProvider provider)
+        {
+            return provider.GetService<TokenService>();
         }
     }
 }
