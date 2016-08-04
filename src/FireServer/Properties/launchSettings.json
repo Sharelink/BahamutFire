@@ -19,7 +19,7 @@
       "commandName": "web",
       "commandLineArgs": "--server.urls http://file.sharelink.online:8089",
       "environmentVariables": {
-        "Hosting:Environment": "Development"
+        "ASPNETCORE_ENVIRONMENT": "Development"
       }
     }
   }
