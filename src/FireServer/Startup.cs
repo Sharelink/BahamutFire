@@ -19,54 +19,59 @@ namespace FireServer
 {
     public class Program
     {
+        public static IConfiguration ArgsConfig { get; private set; }
         public static void Main(string[] args)
         {
-            var configuration = new ConfigurationBuilder()
-            .AddCommandLine(args)
-            .Build();
-
-            var host = new WebHostBuilder()
+            ArgsConfig = new ConfigurationBuilder().AddCommandLine(args).Build();
+            var configFile = ArgsConfig["config"];
+            if (string.IsNullOrEmpty(configFile))
+            {
+                Console.WriteLine("No Config File");
+            }
+            else
+            {
+                var hostBuilder = new WebHostBuilder()
                 .UseKestrel()
-                .UseConfiguration(configuration)
+                .UseConfiguration(ArgsConfig)
                 .UseContentRoot(Directory.GetCurrentDirectory())
-                .UseStartup<Startup>()
-                .Build();
+                .UseStartup<Startup>();
 
-            host.Run();
+                var appConfig = new ConfigurationBuilder()
+                        .SetBasePath(Directory.GetCurrentDirectory())
+                        .AddJsonFile(configFile).Build();
+                var urls = appConfig["Data:App:urls"].Split(new char[] { ';', ',', ' ' });
+                hostBuilder.UseUrls(urls);
+                hostBuilder.Build().Run();
+            }
         }
     }
 
     public class Startup
     {
         public static IConfiguration Configuration { private set; get; }
-        //public static TokenService TokenService { private set; get; }
-       // public static ServerControlManagementService ServerControlMgrService { get; set; }
-        public static string BahamutFireDbUrl { get; private set; }
-        public static string Appkey { get; private set; }
-        public static string AppUrl { get; private set; }
+        public static string BahamutFireDbUrl { get { return Configuration["Data:BahamutFireDBServer:url"]; } }
+        public static string Appkey { get { return Configuration["Data:App:appkey"]; } }
+        public static string AppUrl { get { return Configuration["Data:ServiceApiUrl"]; } }
         public static IServiceProvider AppServiceProvider { get; private set; }
 
         public Startup(IHostingEnvironment env)
         {
-            var builder = new ConfigurationBuilder()
-                .SetBasePath(env.ContentRootPath);
-            var configFile = "";
-            if (env.IsDevelopment())
-            {
-                configFile = "config_debug.json";
-            }
-            else
-            {
-                configFile = "/etc/bahamut/fire.json";
-            }
-            builder.AddJsonFile(configFile,true,true).AddEnvironmentVariables();
-            Configuration = builder.Build();
-            
-            BahamutFireDbUrl = Configuration["Data:BahamutFireDBServer:url"];
-            AppUrl = Configuration["Data:App:url"];
-            Appkey = Configuration["Data:App:appkey"];
+            ReadConfig(env);
         }
 
+        private static void ReadConfig(IHostingEnvironment env)
+        {
+            var builder = new ConfigurationBuilder()
+                .SetBasePath(env.ContentRootPath);
+            var configFile = Program.ArgsConfig["config"];
+            var baseConfig = builder.AddJsonFile(configFile, true, true).Build();
+            var logConfig = baseConfig["Data:LogConfig"];
+            builder.AddJsonFile(configFile, true, true);
+            builder.AddJsonFile(logConfig, true, true);
+            builder.AddEnvironmentVariables();
+            Configuration = builder.Build();
+        }
+        
         // This method gets called by a runtime.
         // Use this method to add services to the container
         public void ConfigureServices(IServiceCollection services)
@@ -92,7 +97,7 @@ namespace FireServer
             var appInstance = new BahamutAppInstance()
             {
                 Appkey = Appkey,
-                InstanceServiceUrl = Configuration["Data:App:url"]
+                InstanceServiceUrl = AppUrl
             };
             try
             {
@@ -115,7 +120,7 @@ namespace FireServer
             AppServiceProvider = app.ApplicationServices;
             //Log
             var logConfig = new LoggingConfiguration();
-            LoggerLoaderHelper.LoadLoggerToLoggingConfig(logConfig, Configuration, "Data:Log:fileLoggers");
+            LoggerLoaderHelper.LoadLoggerToLoggingConfig(logConfig, Configuration, "Logger:fileLoggers");
 
             if (env.IsDevelopment())
             {
