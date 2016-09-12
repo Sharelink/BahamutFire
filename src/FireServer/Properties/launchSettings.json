@@ -17,7 +17,7 @@
     },
     "web": {
       "commandName": "web",
-      "commandLineArgs": "--server.urls http://file.sharelink.online:8089",
+      "commandLineArgs": "--config config_debug.json",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }

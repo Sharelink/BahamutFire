@@ -22,7 +22,7 @@ namespace FireServer.Controllers
         {
             try
             {
-                var fireService = new FireService(Startup.BahamutFireDbUrl);
+                var fireService = Startup.AppServiceProvider.GetFireService();
                 var fire = await fireService.GetFireRecord(accessKey);
                 var fireId = fire.Id.ToString();
                 var contentType = "application/octet-stream";
@@ -87,7 +87,7 @@ namespace FireServer.Controllers
             NLog.LogManager.GetCurrentClassLogger().Info("File Post");
             try
             {
-                var fService = new FireService(Startup.BahamutFireDbUrl);
+                var fService = Startup.AppServiceProvider.GetFireService();
                 var accountId = Request.Headers["accountId"];
                 var newFire = new FireRecord
                 {
@@ -124,7 +124,7 @@ namespace FireServer.Controllers
         {
             var accessKeyArray = accessKeyIds.Split('#');
             var accountId = Request.Headers["accountId"];
-            var fService = new FireService(Startup.BahamutFireDbUrl);
+            var fService = Startup.AppServiceProvider.GetFireService();
             var akService = new FireAccesskeyService();
             var infos = from ak in accessKeyArray select akService.GetFireAccessInfo(ak);
             var fileIds = from fi in infos where fi.AccessFileAccountId == accountId select fi.FileId;

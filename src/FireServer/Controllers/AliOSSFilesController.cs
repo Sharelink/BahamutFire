@@ -68,7 +68,7 @@ namespace FireServer.Controllers
                 var bucket = Startup.Configuration[bucketKey];
                 var uploadUrl = Startup.Configuration[uploadUrlKey];
 
-                var fireService = new FireService(Startup.BahamutFireDbUrl);
+                var fireService = Startup.AppServiceProvider.GetFireService();
                 var accountId = Request.Headers["accountId"];
 
                 var fileTypeList = fileTypes.Split('#');
@@ -108,7 +108,7 @@ namespace FireServer.Controllers
                 var uploadUrlKey = string.Format("Data:AliOSS:{0}:url", appkey);
                 var bucket = Startup.Configuration[bucketKey];
                 var uploadUrl = Startup.Configuration[uploadUrlKey];
-                var fireService = new FireService(Startup.BahamutFireDbUrl);
+                var fireService = Startup.AppServiceProvider.GetFireService();
                 var accountId = Request.Headers["accountId"];
                 var newFire = GenerateNewFireRecord(fileType, fileSize, accountId, uploadUrl, bucket);
                 newFire = await fireService.CreateFireRecord(newFire);

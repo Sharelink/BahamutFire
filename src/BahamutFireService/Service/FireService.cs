@@ -6,6 +6,7 @@ using MongoDB.Bson;
 using System.IO;
 using MongoDB.Driver.GridFS;
 using BahamutFireCommon;
+using System;
 
 namespace BahamutFireService.Service
 {
@@ -17,8 +18,13 @@ namespace BahamutFireService.Service
         public IMongoClient Client { get; set; }
 
         public FireService(string mongoDbUrl)
+            : this(new MongoClient(new MongoUrl(mongoDbUrl)))
         {
-            Client = new MongoClient(new MongoUrl(mongoDbUrl));
+        }
+
+        public FireService(IMongoClient client)
+        {
+            this.Client = client;
         }
 
         public async Task<GridFSFileInfo> GetBigFire(string fileId)

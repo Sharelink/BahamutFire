@@ -19,7 +19,7 @@ namespace FireServer.Controllers
             try
             {
                 var fileId = accessKey;
-                var fireService = new FireService(Startup.BahamutFireDbUrl);
+                var fireService = Startup.AppServiceProvider.GetFireService();
                 var accountId = Request.Headers["accountId"];
                 var fireRecord = await fireService.GetFireRecord(fileId);
                 if (null == fireRecord)

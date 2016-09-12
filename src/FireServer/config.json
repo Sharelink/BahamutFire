@@ -6,15 +6,46 @@
       "appkey": "b078082bd9d5c63da1b4c5d546a9fa44b6c879b2",
       "url": "http://file.sharelink.online:8089"
     },
+
     "BahamutFireDBServer": {
-      "url": "mongodb://$user:$psw@filedb.sharelink.online:27017"
+      "minPoolSize": 1,
+      "maxPoolSize": 2,
+      "masters": [
+        {
+          "url": "mongodb://$user:$psw@filedb.sharelink.online:27017"
+        }
+      ],
+      "slaves": [
+        {
+          "url": "mongodb://$user:$psw@filedb.sharelink.online:27017"
+        }
+      ]  
     },
+
     "TokenServer": {
-      "url": "redis://$psw@token.sharelink.online:6379"
+      "minPoolSize": 1,
+      "maxPoolSize": 2,
+      "masters": [
+        {
+          "url": "redis://$psw@token.sharelink.online:6379"
+        }
+      ],
+      "slaves": [
+        {
+          "url": "redis://$psw@token.sharelink.online:6379"
+        }
+      ]
     },
 
     "ControlServiceServer": {
-      "url": "redis://$psw@app.sharelink.online:6733"
+      "minPoolSize": 1,
+      "maxPoolSize": 1,
+      "masters": [
+        {
+          "url": "redis://$psw@app.sharelink.online:6379"
+        }
+      ],
+      "slaves": []
     },
 
     "AliOSS": {

@@ -14,6 +14,8 @@ using BahamutCommon;
 using BahamutAspNetCommon;
 using System.IO;
 using Newtonsoft.Json.Serialization;
+using DataLevelDefines;
+using BahamutFireService.Service;
 
 namespace FireServer
 {
@@ -49,7 +51,6 @@ namespace FireServer
     public class Startup
     {
         public static IConfiguration Configuration { private set; get; }
-        public static string BahamutFireDbUrl { get { return Configuration["Data:BahamutFireDBServer:url"]; } }
         public static string Appkey { get { return Configuration["Data:App:appkey"]; } }
         public static string AppUrl { get { return Configuration["Data:ServiceApiUrl"]; } }
         public static IServiceProvider AppServiceProvider { get; private set; }
@@ -85,13 +86,13 @@ namespace FireServer
 
             services.AddScoped<LogExceptionFilter>();
 
-            var tokenServerUrl = Configuration["Data:TokenServer:url"].Replace("redis://", "");
-            IRedisClientsManager TokenServerClientManager = new PooledRedisClientManager(tokenServerUrl);
+            services.AddSingleton(new FireService(DBClientManagerBuilder.GeneratePoolMongodbClient(Configuration.GetSection("Data:BahamutFireDBServer"))));
+
+            IRedisClientsManager TokenServerClientManager = DBClientManagerBuilder.GenerateRedisClientManager(Configuration.GetSection("Data:TokenServer"));
             var tokenService = new TokenService(TokenServerClientManager);
             services.AddSingleton(tokenService);
 
-            var serverControlUrl = Configuration["Data:ControlServiceServer:url"].Replace("redis://", "");
-            IRedisClientsManager ControlServerServiceClientManager = new PooledRedisClientManager(serverControlUrl);
+            IRedisClientsManager ControlServerServiceClientManager = DBClientManagerBuilder.GenerateRedisClientManager(Configuration.GetSection("Data:ControlServiceServer"));
             var serverControlMgrService = new ServerControlManagementService(ControlServerServiceClientManager);
             services.AddSingleton(serverControlMgrService);
             var appInstance = new BahamutAppInstance()
@@ -161,6 +162,11 @@ namespace FireServer
         public static TokenService GetTokenService(this IServiceProvider provider)
         {
             return provider.GetService<TokenService>();
+        }
+
+        public static FireService GetFireService(this IServiceProvider provider)
+        {
+            return provider.GetService<FireService>();
         }
     }
 }
