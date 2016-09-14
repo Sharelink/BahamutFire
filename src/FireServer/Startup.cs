@@ -4,11 +4,9 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using BahamutService;
 using Microsoft.Extensions.Configuration;
-using ServiceStack.Redis;
 using ServerControlService.Model;
 using NLog;
 using ServerControlService.Service;
-using Microsoft.Extensions.PlatformAbstractions;
 using NLog.Config;
 using BahamutCommon;
 using BahamutAspNetCommon;
@@ -16,6 +14,8 @@ using System.IO;
 using Newtonsoft.Json.Serialization;
 using DataLevelDefines;
 using BahamutFireService.Service;
+using Newtonsoft.Json;
+using ServerControlService;
 
 namespace FireServer
 {
@@ -52,6 +52,10 @@ namespace FireServer
     {
         public static IConfiguration Configuration { private set; get; }
         public static string Appkey { get { return Configuration["Data:App:appkey"]; } }
+        public static string AppChannelId { get { return Configuration[string.Format("AppChannel:{0}:channel", Appkey)]; } }
+        public static string Appname { get { return Configuration["Data:App:appname"]; } }
+        public string AppRegion { get { return Configuration["Data:App:region"]; } }
+
         public static string AppUrl { get { return Configuration["Data:ServiceApiUrl"]; } }
         public static IServiceProvider AppServiceProvider { get; private set; }
 
@@ -88,31 +92,14 @@ namespace FireServer
 
             services.AddSingleton(new FireService(DBClientManagerBuilder.GeneratePoolMongodbClient(Configuration.GetSection("Data:BahamutFireDBServer"))));
 
-            IRedisClientsManager TokenServerClientManager = DBClientManagerBuilder.GenerateRedisClientManager(Configuration.GetSection("Data:TokenServer"));
+            var TokenServerClientManager = DBClientManagerBuilder.GenerateRedisConnectionMultiplexer(Configuration.GetSection("Data:TokenServer"));
             var tokenService = new TokenService(TokenServerClientManager);
             services.AddSingleton(tokenService);
 
-            IRedisClientsManager ControlServerServiceClientManager = DBClientManagerBuilder.GenerateRedisClientManager(Configuration.GetSection("Data:ControlServiceServer"));
+            var ControlServerServiceClientManager = DBClientManagerBuilder.GenerateRedisConnectionMultiplexer(Configuration.GetSection("Data:ControlServiceServer"));
             var serverControlMgrService = new ServerControlManagementService(ControlServerServiceClientManager);
             services.AddSingleton(serverControlMgrService);
-            var appInstance = new BahamutAppInstance()
-            {
-                Appkey = Appkey,
-                InstanceServiceUrl = AppUrl
-            };
-            try
-            {
-                appInstance = serverControlMgrService.RegistAppInstance(appInstance);
-                var observer = serverControlMgrService.StartKeepAlive(appInstance);
-                observer.OnExpireError += KeepAliveObserver_OnExpireError;
-                observer.OnExpireOnce += KeepAliveObserver_OnExpireOnce;
-                LogManager.GetLogger("Main").Info("Bahamut App Instance:" + appInstance.Id.ToString());
-                LogManager.GetLogger("Main").Info("Keep Server Instance Alive To Server Controller Thread Started!");
-            }
-            catch (Exception ex)
-            {
-                LogManager.GetLogger("Main").Error(ex, "Unable To Regist App Instance");
-            }
+
         }
 
         // Configure is called after ConfigureServices is called.
@@ -137,18 +124,19 @@ namespace FireServer
             // Add MVC to the request pipeline.
             app.UseMvc();
 
+            //Regist App Instance
+            BahamutAppInstanceRegister.RegistAppInstance(AppServiceProvider.GetServerControlManagementService(), new BahamutAppInstance()
+            {
+                Appkey = Appkey,
+                Region = AppRegion,
+                Channel = AppChannelId,
+                InfoForClient = JsonConvert.SerializeObject(new
+                {
+                    apiUrl = AppUrl
+                })
+            });
+
             LogManager.GetLogger("Main").Info("Fire Started!");
-        }
-
-        private void KeepAliveObserver_OnExpireOnce(object sender, KeepAliveObserverEventArgs e)
-        {
-
-        }
-
-        private void KeepAliveObserver_OnExpireError(object sender, KeepAliveObserverEventArgs e)
-        {
-            LogManager.GetLogger("Main").Error(string.Format("Expire Server Error.Instance:{0}", e.Instance.Id), e);
-            AppServiceProvider.GetServerControlManagementService().ReActiveAppInstance(e.Instance);
         }
     }
 

@@ -7,6 +7,12 @@
       "url": "http://file.sharelink.online:8089"
     },
 
+    "LogConfig": "logsettings.json",
+
+    "ServiceApiUrl": "http://fire.bahamut.cn:8089",
+
+    "AppChannelConfig": "/etc/bahamut/bahamut_app_channel.json",
+
     "BahamutFireDBServer": {
       "minPoolSize": 1,
       "maxPoolSize": 2,
@@ -19,7 +25,7 @@
         {
           "url": "mongodb://$user:$psw@filedb.sharelink.online:27017"
         }
-      ]  
+      ]
     },
 
     "TokenServer": {

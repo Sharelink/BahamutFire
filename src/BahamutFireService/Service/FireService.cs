@@ -35,7 +35,7 @@ namespace BahamutFireService.Service
             return fires.First();
         }
 
-        public async Task<GridFSDownloadStream> GetBigFireStream(string fileId)
+        public async Task<GridFSDownloadStream<ObjectId>> GetBigFireStream(string fileId)
         {
             var bucket = new GridFSBucket(Client.GetDatabase(BigDataFireDBName));
             var fireStream = await bucket.OpenDownloadStreamByNameAsync(fileId);

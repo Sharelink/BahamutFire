@@ -5,11 +5,10 @@
   "dependencies": {
     "BahamutCommon": "1.0.0-*",
     "DataLevelDefines": "1.0.0-*",
-    "MongoDB.Driver.GridFS": "2.2.4",
-    "DBTek.Crypto": "2.1.0"
+    "MongoDB.Driver.GridFS": "2.3.0-rc1"
   },
 
   "frameworks": {
-    "net451": { }
+    "netcoreapp1.0": { }
   }
 }
