@@ -15,8 +15,9 @@
         "Hosting:Environment": "Development"
       }
     },
-    "web": {
-      "commandName": "web",
+    "Fire": {
+      "commandName": "Project",
+      "launchUrl": "http://localhost:5000",
       "commandLineArgs": "--config config_debug.json",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"

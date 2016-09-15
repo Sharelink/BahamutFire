@@ -71,8 +71,10 @@ namespace FireServer
             var configFile = Program.ArgsConfig["config"];
             var baseConfig = builder.AddJsonFile(configFile, true, true).Build();
             var logConfig = baseConfig["Data:LogConfig"];
+            var appChannelConfig = baseConfig["Data:AppChannelConfig"];
             builder.AddJsonFile(configFile, true, true);
             builder.AddJsonFile(logConfig, true, true);
+            builder.AddJsonFile(appChannelConfig, true, true);
             builder.AddEnvironmentVariables();
             Configuration = builder.Build();
         }
@@ -86,6 +88,8 @@ namespace FireServer
             }).AddJsonOptions(x =>
             {
                 x.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
+                x.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
+                x.SerializerSettings.Formatting = Formatting.None;
             });
 
             services.AddScoped<LogExceptionFilter>();
