@@ -4,7 +4,7 @@
     "App": {
       "appname": "FireServer",
       "appkey": "b078082bd9d5c63da1b4c5d546a9fa44b6c879b2",
-      "url": "http://file.sharelink.online:8089"
+      "urls":"http://file.sharelink.online:8089"
     },
 
     "LogConfig": "logsettings.json",
