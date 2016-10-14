@@ -40,7 +40,7 @@ namespace FireServer
 
                 var appConfig = new ConfigurationBuilder()
                         .SetBasePath(Directory.GetCurrentDirectory())
-                        .AddJsonFile(configFile).Build();
+                        .AddJsonFile(configFile,true,true).Build();
                 var urls = appConfig["Data:App:urls"].Split(new char[] { ';', ',', ' ' });
                 hostBuilder.UseUrls(urls);
                 hostBuilder.Build().Run();
