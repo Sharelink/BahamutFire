@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using BahamutFireService.Service;
 using BahamutFireCommon;
 using BahamutCommon;
 using System.Net;
@@ -15,13 +14,13 @@ namespace FireServer.Controllers
     public class AliOSSFileInfo
     {
         public const string AliOssServerType = "alioss";
-        public string Bucket { get; set; }
+        //public string Bucket { get; set; }
     }
 
     [Route("[controller]")]
     public class AliOSSFilesController : Controller
     {
-        private object FireRecordToObject(FireRecord newFire,string bucket)
+        private object FireRecordToObject(FireRecord newFire, string bucket)
         {
             var fireObj = new
             {
@@ -35,12 +34,8 @@ namespace FireServer.Controllers
             return fireObj;
         }
 
-        private FireRecord GenerateNewFireRecord(string fileType,int fileSize,string accountId,string uploadUrl,string bucket)
+        private FireRecord GenerateNewFireRecord(string fileType, int fileSize, string accountId, string uploadUrl, string bucket)
         {
-            var aliOssInfo = new AliOSSFileInfo()
-            {
-                Bucket = bucket
-            };
             var newFire = new FireRecord()
             {
                 CreateTime = DateTime.UtcNow,
@@ -52,7 +47,7 @@ namespace FireServer.Controllers
                 AccessKeyConverter = "",
                 UploadServerUrl = uploadUrl,
                 ServerType = AliOSSFileInfo.AliOssServerType,
-                Extra = Newtonsoft.Json.JsonConvert.SerializeObject(aliOssInfo)
+                Bucket = bucket
             };
             return newFire;
         }

@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using BahamutCommon;
-using BahamutFireService.Service;
 
 // For more information on enabling Web API for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -26,18 +25,12 @@ namespace FireServer.Controllers
                 {
                     throw new Exception();
                 }
-                var bucket = "";
-                if (AliOSSFileInfo.AliOssServerType == fireRecord.ServerType)
-                {
-                    var aliossInfo = Newtonsoft.Json.JsonConvert.DeserializeObject<AliOSSFileInfo>(fireRecord.Extra);
-                    bucket = aliossInfo.Bucket;
-                }
                 return new
                 {
                     fileId = fireRecord.Id.ToString(),
                     server = fireRecord.UploadServerUrl,
                     accessKey = fireRecord.Id.ToString(),
-                    bucket = bucket,
+                    bucket = fireRecord.Bucket,
                     serverType = fireRecord.ServerType,
                     expireAt = DateTimeUtil.ToString(DateTime.UtcNow.AddDays(7))
                 };

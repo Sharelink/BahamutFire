@@ -27,6 +27,7 @@ namespace BahamutFireCommon
         public ObjectId BigFireId { get; set; }
         public string UploadServerUrl { get; set; }
         public string Extra { get; set; }
+        public string Bucket { get; set; }
         public string ServerType { get; set; }
     }
 
