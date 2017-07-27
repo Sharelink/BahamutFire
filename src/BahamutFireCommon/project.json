@@ -5,7 +5,7 @@
   "dependencies": {
     "BahamutCommon": "1.0.0-*",
     "DataLevelDefines": "1.0.0-*",
-    "MongoDB.Driver.GridFS": "2.3.0-rc1"
+    "MongoDB.Driver.GridFS": "2.4.4"
   },
 
   "frameworks": {
